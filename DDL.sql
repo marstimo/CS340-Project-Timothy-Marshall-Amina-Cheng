@@ -158,4 +158,61 @@ CREATE TABLE WantedItems ( -- Products customers want to buy when they come back
   CONSTRAINT uq_wanted_unique UNIQUE (customerID, productID) -- Prevent same customer from wishing the same product multiple times
 ) ENGINE=InnoDB;
 
--- Sample Data
+-------------------------------
+----------Sample Data----------
+-------------------------------
+
+INSERT INTO Customers (firstName, lastName, email, phoneNumber) VALUES
+('Tim', 'Marshall', 'tim@example.com', '555-111-2222'),
+('Amina', 'Cheng', 'amina@example.com', '555-333-4444');
+
+INSERT INTO Addresses (customerID, line1, line2, city, state, zipCode) VALUES
+(1, '123 SW Oak St', NULL, 'Corvallis', 'OR', '97330'),
+(1, '55 NW Maple Ave', 'Apt 2', 'Corvallis', 'OR', '97330'),
+(2, '900 SE Pine St', NULL, 'Albany', 'OR', '97321');
+
+INSERT INTO Sets (name, description, releaseDate) VALUES
+('Modern Horizons 3', 'A modern-focused Magic set.', '2024-06-14'),
+('Bloomburrow', 'Fantasy woodland-themed Magic set.', '2024-08-02'),
+('Scarlet & Violet', 'Pokémon TCG base set.', '2023-03-31');
+
+-- Products: 2 cards + 1 booster box + 1 extra product for wishlist demo
+INSERT INTO Products (productType) VALUES
+('Card'),        -- productID 1
+('Card'),        -- productID 2
+('BoosterBox'),  -- productID 3
+('Card');        -- productID 4
+
+INSERT INTO Cards (setID, productID, name, description, `condition`) VALUES
+(1, 1, 'Ulamog, the Defiler', 'Mythic rare card.', 'Near Mint'),
+(2, 2, 'Mabel, Heir to Cragflame', 'Legendary creature.', 'Lightly Played'),
+(3, 4, 'Pikachu', 'Popular Pokémon card.', 'Near Mint');
+
+INSERT INTO BoosterBoxes (setID, productID, name, description, sku) VALUES
+(1, 3, 'Modern Horizons 3 Booster Box', 'Sealed booster box.', 'MH3-BB-001');
+
+INSERT INTO Inventories (productID, price, quantity) VALUES
+(1, 39.99, 2),
+(2, 12.50, 0),
+(3, 249.99, 5),
+(4, 4.99, 12);
+
+INSERT INTO Orders (customerID, addressID, orderNumber, orderDate, orderStatus, grandTotal) VALUES
+(1, 1, 'ORD-10001', '2026-02-03 10:15:00', 'Processing', 289.98),
+(2, 3, 'ORD-10002', '2026-02-03 11:30:00', 'Shipped', 4.99);
+
+INSERT INTO OrderItems (orderID, productID, unitPrice, quantity, amount) VALUES
+(1, 3, 249.99, 1, 249.99),
+(1, 1, 39.99, 1, 39.99),
+(2, 4, 4.99, 1, 4.99);
+
+INSERT INTO Payments (orderID, paymentNumber, paymentMethod, amount, paymentDate) VALUES
+(1, 'PAY-90001', 'Credit Card', 289.98, '2026-02-03 10:16:00'),
+(2, 'PAY-90002', 'Debit Card', 4.99, '2026-02-03 11:31:00');
+
+INSERT INTO WantedItems (productID, customerID, createdDate) VALUES
+(2, 1, '2026-02-03 09:00:00'),
+(2, 2, '2026-02-03 09:05:00');
+
+SET FOREIGN_KEY_CHECKS = 1;
+COMMIT;
