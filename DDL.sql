@@ -121,7 +121,7 @@ INSERT INTO Products (productType, setID, name, cardCondition, sku, price, quant
 INSERT INTO Orders
 (customerID, orderNumber, orderDate, orderStatus, grandTotal) VALUES
 (1, 'ORD-10001', '2026-02-03 10:15:00', 'Processing', 289.98),
-(2, 'ORD-10002', '2026-02-03 11:30:00', 'Shipped', 4.99,);
+(2, 'ORD-10002', '2026-02-03 11:30:00', 'Shipped', 4.99);
 
 INSERT INTO OrderItems
 (orderID, productID, unitPrice, quantity, amount) VALUES
