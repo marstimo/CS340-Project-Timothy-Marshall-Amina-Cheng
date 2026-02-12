@@ -52,3 +52,32 @@ WHERE setID=@setID;
 ----------------------------
 ----------Products----------
 ----------------------------
+
+-- Browse products
+SELECT p.productID, p.productType, s.name AS setName, p.name, p.cardCondition, p.sku, p.price, p.quantity
+FROM Products p
+JOIN Sets s ON p.setID = s.setID
+ORDER BY p.productType, s.name, p.name;
+
+-- Dropdown for sets
+SELECT setID, name
+FROM Sets
+ORDER BY name;
+
+-- Add product
+INSERT INTO Products (productType, setID, name, cardCondition, sku, price, quantity)
+VALUES (@productType, @setID, @name, @cardCondition, @sku, @price, @quantity);
+
+-- Update product
+UPDATE Products
+SET productType=@productType, setID=@setID, name=@name, cardCondition=@cardCondition,
+    sku=@sku, price=@price, quantity=@quantity
+WHERE productID=@productID;
+
+-- Delete product
+DELETE FROM Products
+WHERE productID=@productID;
+
+--------------------------
+----------Orders----------
+--------------------------
