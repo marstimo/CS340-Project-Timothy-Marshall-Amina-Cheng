@@ -4,9 +4,9 @@ Team: Amina Cheng, Timothy Marshall
 DML Queries
 */
 
------------------------------
-----------Customers----------
------------------------------
+-- -------------------------
+-- --------Customers--------
+-- -------------------------
 
 -- Browse customers
 SELECT customerID, firstName, lastName, email, phoneNumber, address1, address2, city, state, zipCode
@@ -27,9 +27,9 @@ WHERE customerID=@customerID;
 DELETE FROM Customers
 WHERE customerID=@customerID;
 
-------------------------
-----------Sets----------
-------------------------
+-- --------------------
+-- --------Sets--------
+-- --------------------
 
 -- Browse sets
 SELECT setID, name, description, releaseDate
@@ -49,9 +49,9 @@ WHERE setID=@setID;
 DELETE FROM Sets
 WHERE setID=@setID;
 
-----------------------------
-----------Products----------
-----------------------------
+-- ------------------------
+-- --------Products--------
+-- ------------------------
 
 -- Browse products
 SELECT p.productID, p.productType, s.name AS setName, p.name, p.cardCondition, p.sku, p.price, p.quantity
@@ -78,9 +78,9 @@ WHERE productID=@productID;
 DELETE FROM Products
 WHERE productID=@productID;
 
---------------------------
-----------Orders----------
---------------------------
+-- ----------------------
+-- --------Orders--------
+-- ----------------------
 
 -- Browse orders
 SELECT o.orderID, o.orderNumber, o.orderDate, o.orderStatus, o.grandTotal,
@@ -108,9 +108,9 @@ WHERE orderID=@orderID;
 DELETE FROM Orders
 WHERE orderID=@orderID;
 
-------------------------------
-----------OrderItems----------
-------------------------------
+-- --------------------------
+-- --------OrderItems--------
+-- --------------------------
 
 -- Browse order items
 SELECT oi.orderItemID, o.orderNumber, p.name AS productName,
@@ -144,9 +144,9 @@ WHERE orderItemID=@orderItemID;
 DELETE FROM OrderItems
 WHERE orderItemID=@orderItemID;
 
-----------------------------
-----------Payments----------
-----------------------------
+-- ------------------------
+-- --------Payments--------
+-- ------------------------
 
 -- Browse payments
 SELECT pay.paymentID, o.orderNumber, pay.paymentNumber, pay.paymentMethod, pay.amount, pay.paymentDate

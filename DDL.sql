@@ -16,30 +16,31 @@ DROP TABLE IF EXISTS Products;
 DROP TABLE IF EXISTS Sets;
 DROP TABLE IF EXISTS Customers;
 
--------------------------------
-----------Core Tables----------
--------------------------------
+-- ---------------------------
+-- --------Core Tables--------
+-- ---------------------------
 
 CREATE TABLE Customers ( -- Stores registered customers who can place orders and track wanted items
     customerID  INT AUTO_INCREMENT PRIMARY KEY,
     firstName   VARCHAR(50) NOT NULL,
     lastName    VARCHAR(50) NOT NULL,
     email       VARCHAR(100) NOT NULL,
-    phoneNumber VARCHAR(15),
+    phoneNumber VARCHAR(15) NULL,
     -- Shipping address fields below
-    line1         VARCHAR(100) NOT NULL,
-    line2         VARCHAR(100),
-    city          VARCHAR(50)  NOT NULL,
-    state         VARCHAR(50)  NOT NULL,
-    zipCode       VARCHAR(10)  NOT NULL,
+    address1    VARCHAR(100) NOT NULL,
+    address2    VARCHAR(100) NULL,
+    city        VARCHAR(50)  NOT NULL,
+    state       VARCHAR(50)  NOT NULL,
+    zipCode     VARCHAR(10)  NOT NULL,
     CONSTRAINT uq_customers_email UNIQUE (email) -- Prevent duplicate customer emails
 ) ENGINE=InnoDB;
 
 CREATE TABLE Sets ( -- Trading card sets / expansions used to group cards and booster boxes
     setID       INT AUTO_INCREMENT PRIMARY KEY,
     name    VARCHAR(100) NOT NULL,
-    description VARCHAR(255),
-    releaseDate DATE NOT NULL
+    description VARCHAR(255) NULL,
+    releaseDate DATE NOT NULL,
+    CONSTRAINT uq_sets_name UNIQUE (name)
 ) ENGINE=InnoDB;
 
 CREATE TABLE Products (
@@ -59,10 +60,10 @@ CREATE TABLE Products (
 
 CREATE TABLE Orders ( -- Customer purchase transactions
   orderID     INT AUTO_INCREMENT PRIMARY KEY,
-  customerID  INT NOT NULL,
+  customerID  INT NULL,
   orderNumber VARCHAR(30) NOT NULL,
   orderDate   DATETIME NOT NULL,
-  orderStatus VARCHAR(30) NOT NULL,
+  orderStatus VARCHAR(30) NULL,
   grandTotal  DECIMAL(10,2) NOT NULL,
   CONSTRAINT uq_orders_orderNumber UNIQUE (orderNumber), -- Prevent duplicate order numbers
   CONSTRAINT fk_orders_customers -- FK: each order must belong to an existing customer
@@ -83,6 +84,7 @@ CREATE TABLE OrderItems ( -- Intersection table resolving the M:N relationship b
   CONSTRAINT fk_orderitems_products -- FK: each order item must reference an existing product
     FOREIGN KEY (productID) REFERENCES Products(productID)
     ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT uq_orderitems_order_product UNIQUE (orderID, productID)
 ) ENGINE=InnoDB;
 
 CREATE TABLE Payments ( -- Payment records associated with completed orders
@@ -99,11 +101,11 @@ CREATE TABLE Payments ( -- Payment records associated with completed orders
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
--------------------------------
-----------Sample Data----------
--------------------------------
+-- ---------------------------
+-- --------Sample Data--------
+-- ---------------------------
 
-INSERT INTO Customers (firstName, lastName, email, phoneNumber, line1, line2, city, state, zipCode) VALUES
+INSERT INTO Customers (firstName, lastName, email, phoneNumber, address1, address2, city, state, zipCode) VALUES
 ('Tim', 'Marshall', 'tim@example.com', '555-111-2222', '123 SW Oak St', NULL, 'Corvallis', 'OR', '97330'),
 ('Amina', 'Cheng', 'amina@example.com', '555-333-4444', '900 SE Pine St', NULL, 'Albany', 'OR', '97321');
 
@@ -113,25 +115,48 @@ INSERT INTO Sets (name, description, releaseDate) VALUES
 ('Scarlet & Violet', 'Pokémon TCG base set.', '2023-03-31');
 
 INSERT INTO Products (productType, setID, name, cardCondition, sku, price, quantity) VALUES
-('CARD', 1, 'Ulamog, the Defiler', 'NM', NULL, 39.99, 2),
-('CARD', 2, 'Mabel, Heir to Cragflame', 'LP', NULL, 12.50, 0),
-('CARD', 3, 'Pikachu', 'NM', NULL, 4.99, 12),
-('BOX',  1, 'Modern Horizons 3 Booster Box', NULL, 'MH3-BB-001', 249.99, 5);
+('CARD',
+ (SELECT setID FROM Sets WHERE name='Modern Horizons 3' LIMIT 1),
+ 'Ulamog, the Defiler', 'NM', NULL, 39.99, 2),
 
-INSERT INTO Orders
-(customerID, orderNumber, orderDate, orderStatus, grandTotal) VALUES
-(1, 'ORD-10001', '2026-02-03 10:15:00', 'Processing', 289.98),
-(2, 'ORD-10002', '2026-02-03 11:30:00', 'Shipped', 4.99);
+('CARD',
+ (SELECT setID FROM Sets WHERE name='Bloomburrow' LIMIT 1),
+ 'Mabel, Heir to Cragflame', 'LP', NULL, 12.50, 0),
 
-INSERT INTO OrderItems
-(orderID, productID, unitPrice, quantity, amount) VALUES
-(1, 4, 249.99, 1, 249.99), -- Booster Box
-(1, 1, 39.99, 1, 39.99),   -- Card
-(2, 3, 4.99, 1, 4.99);     -- Card
+('CARD',
+ (SELECT setID FROM Sets WHERE name='Scarlet & Violet' LIMIT 1),
+ 'Pikachu', 'NM', NULL, 4.99, 12),
+
+('BOX',
+ (SELECT setID FROM Sets WHERE name='Modern Horizons 3' LIMIT 1),
+ 'Modern Horizons 3 Booster Box', NULL, 'MH3-BB-001', 249.99, 5);
+
+INSERT INTO Orders (customerID, orderNumber, orderDate, orderStatus, grandTotal) VALUES
+((SELECT customerID FROM Customers WHERE email='tim@example.com' LIMIT 1),
+ 'ORD-10001', '2026-02-03 10:15:00', 'Processing', 289.98),
+
+((SELECT customerID FROM Customers WHERE email='amina@example.com' LIMIT 1),
+ 'ORD-10002', '2026-02-03 11:30:00', 'Shipped', 4.99);
+
+INSERT INTO OrderItems (orderID, productID, unitPrice, quantity, amount) VALUES
+((SELECT orderID FROM Orders WHERE orderNumber='ORD-10001' LIMIT 1),
+ (SELECT productID FROM Products WHERE name='Modern Horizons 3 Booster Box' LIMIT 1),
+ 249.99, 1, 249.99),
+
+((SELECT orderID FROM Orders WHERE orderNumber='ORD-10001' LIMIT 1),
+ (SELECT productID FROM Products WHERE name='Ulamog, the Defiler' LIMIT 1),
+ 39.99, 1, 39.99),
+
+((SELECT orderID FROM Orders WHERE orderNumber='ORD-10002' LIMIT 1),
+ (SELECT productID FROM Products WHERE name='Pikachu' LIMIT 1),
+ 4.99, 1, 4.99);
 
 INSERT INTO Payments (orderID, paymentNumber, paymentMethod, amount, paymentDate) VALUES
-(1, 'PAY-90001', 'Credit Card', 289.98, '2026-02-03 10:16:00'),
-(2, 'PAY-90002', 'Debit Card', 4.99, '2026-02-03 11:31:00');
+((SELECT orderID FROM Orders WHERE orderNumber='ORD-10001' LIMIT 1),
+ 'PAY-90001', 'Credit Card', 289.98, '2026-02-03 10:16:00'),
+
+((SELECT orderID FROM Orders WHERE orderNumber='ORD-10002' LIMIT 1),
+ 'PAY-90002', 'Debit Card', 4.99, '2026-02-03 11:31:00');
 
 SET FOREIGN_KEY_CHECKS = 1;
 COMMIT;
