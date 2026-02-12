@@ -81,3 +81,34 @@ WHERE productID=@productID;
 --------------------------
 ----------Orders----------
 --------------------------
+
+-- Browse orders
+SELECT o.orderID, o.orderNumber, o.orderDate, o.orderStatus, o.grandTotal,
+       c.customerID, c.firstName, c.lastName, c.email
+FROM Orders o
+LEFT JOIN Customers c ON o.customerID = c.customerID
+ORDER BY o.orderDate DESC;
+
+-- Dropdown for customers
+SELECT customerID, CONCAT(firstName, ' ', lastName, ' (', email, ')') AS customerLabel
+FROM Customers
+ORDER BY lastName, firstName;
+
+-- Add order
+INSERT INTO Orders (customerID, orderNumber, orderDate, orderStatus, grandTotal)
+VALUES (@customerID, @orderNumber, @orderDate, @orderStatus, @grandTotal);
+
+-- Update order
+UPDATE Orders
+SET customerID=@customerID, orderNumber=@orderNumber, orderDate=@orderDate,
+    orderStatus=@orderStatus, grandTotal=@grandTotal
+WHERE orderID=@orderID;
+
+-- Delete order
+DELETE FROM Orders
+WHERE orderID=@orderID;
+
+------------------------------
+----------OrderItems----------
+------------------------------
+
