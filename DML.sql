@@ -112,3 +112,38 @@ WHERE orderID=@orderID;
 ----------OrderItems----------
 ------------------------------
 
+-- Browse order items
+SELECT oi.orderItemID, o.orderNumber, p.name AS productName,
+       oi.unitPrice, oi.quantity, oi.amount
+FROM OrderItems oi
+JOIN Orders o ON oi.orderID = o.orderID
+JOIN Products p ON oi.productID = p.productID
+ORDER BY o.orderDate DESC, o.orderNumber, oi.orderItemID;
+
+-- Dropdown for orders
+SELECT orderID, orderNumber
+FROM Orders
+ORDER BY orderDate DESC;
+
+-- Dropdown for products
+SELECT productID, CONCAT(name, ' ($', price, ')') AS productLabel
+FROM Products
+ORDER BY name;
+
+-- Add order item
+INSERT INTO OrderItems (orderID, productID, unitPrice, quantity, amount)
+VALUES (@orderID, @productID, @unitPrice, @quantity, @amount);
+
+-- Update order item
+UPDATE OrderItems
+SET orderID=@orderID, productID=@productID, unitPrice=@unitPrice,
+    quantity=@quantity, amount=@amount
+WHERE orderItemID=@orderItemID;
+
+-- Delete order item
+DELETE FROM OrderItems
+WHERE orderItemID=@orderItemID;
+
+----------------------------
+----------Payments----------
+----------------------------
