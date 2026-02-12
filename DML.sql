@@ -147,3 +147,30 @@ WHERE orderItemID=@orderItemID;
 ----------------------------
 ----------Payments----------
 ----------------------------
+
+-- Browse payments
+SELECT pay.paymentID, o.orderNumber, pay.paymentNumber, pay.paymentMethod, pay.amount, pay.paymentDate
+FROM Payments pay
+JOIN Orders o ON pay.orderID = o.orderID
+ORDER BY pay.paymentDate DESC;
+
+-- Dropdown for orders that do NOT already have a payment
+SELECT o.orderID, o.orderNumber
+FROM Orders o
+LEFT JOIN Payments p ON o.orderID = p.orderID
+WHERE p.orderID IS NULL
+ORDER BY o.orderDate DESC;
+
+-- Add payment
+INSERT INTO Payments (orderID, paymentNumber, paymentMethod, amount, paymentDate)
+VALUES (@orderID, @paymentNumber, @paymentMethod, @amount, @paymentDate);
+
+-- Update payment
+UPDATE Payments
+SET orderID=@orderID, paymentNumber=@paymentNumber, paymentMethod=@paymentMethod,
+    amount=@amount, paymentDate=@paymentDate
+WHERE paymentID=@paymentID;
+
+-- Delete payment
+DELETE FROM Payments
+WHERE paymentID=@paymentID;
