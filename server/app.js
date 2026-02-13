@@ -16,7 +16,7 @@ app.engine('.hbs', engine({ extname: '.hbs' })); // Create instance of handlebar
 app.set('view engine', '.hbs'); // Use handlebars engine for *.hbs files.
 
 // READ ROUTES
-app.get('/', async function (req, res) {
+app.get('/home', async function (req, res) {
     try {
         res.render('home'); // Render the home.hbs file
     } catch (error) {
