@@ -27,7 +27,7 @@ app.get('/', async function (req, res) {
 });
 
 // OrderItems
-app.get('/order-items', async function (req, res) {
+app.get('/orderItems', async function (req, res) {
     try {
         // OrderItems rows
         const queryOrderItems = `
@@ -64,7 +64,7 @@ app.get('/order-items', async function (req, res) {
         const [orders] = await db.query(queryOrders);
         const [products] = await db.query(queryProducts);
 
-        res.render('orderItems.hbs', {
+        res.render('orderItems', {
             orderItems: orderItems,
             orders: orders,
             products: products,
