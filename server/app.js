@@ -5,7 +5,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-const PORT = process.env.PORT || 1122;
+const PORT = process.env.PORT || 7777;
 
 // Database
 const db = require('./database/db-connector');
@@ -54,7 +54,7 @@ app.get('/customers', async function (req, res) {
 });
 
 // OrderItems
-app.get('/order-items', async function (req, res) {
+app.get('/orderItems', async function (req, res) {
     try {
         // OrderItems rows
         const queryOrderItems = `
@@ -91,7 +91,7 @@ app.get('/order-items', async function (req, res) {
         const [orders] = await db.query(queryOrders);
         const [products] = await db.query(queryProducts);
 
-        res.render('orderItems.hbs', {
+        res.render('orderItems', {
             orderItems: orderItems,
             orders: orders,
             products: products,
