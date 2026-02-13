@@ -4,13 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "development": "npx nodemon app.js",
+    "production": "npx forever start app.js",
+    "stop_production": "npx forever stop app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^5.2.1",
-    "express-handlebars": "^8.0.3"
+    "express-handlebars": "^8.0.3",
+    "forever": "^4.0.3",
+    "mysql2": "^3.12.0",
+    "nodemon": "^3.1.9"
   }
 }
