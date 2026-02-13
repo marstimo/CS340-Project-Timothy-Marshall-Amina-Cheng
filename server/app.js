@@ -5,7 +5,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-const PORT = 1122;
+const PORT = process.env.PORT || 1122;
 
 // Database
 const db = require('./database/db-connector');
@@ -26,23 +26,51 @@ app.get('/', async function (req, res) {
     }
 });
 
-app.get('/bsg-people', async function (req, res) {
+// OrderItems
+app.get('/order-items', async function (req, res) {
     try {
-        // Create and execute our queries
-        // In query1, we use a JOIN clause to display the names of the homeworlds
-        const query1 = `SELECT bsg_people.id, bsg_people.fname, bsg_people.lname, \
-            bsg_planets.name AS 'homeworld', bsg_people.age FROM bsg_people \
-            LEFT JOIN bsg_planets ON bsg_people.homeworld = bsg_planets.id;`;
-        const query2 = 'SELECT * FROM bsg_planets;';
-        const [people] = await db.query(query1);
-        const [homeworlds] = await db.query(query2);
+        // OrderItems rows
+        const queryOrderItems = `
+            SELECT 
+                OrderItems.orderItemID,
+                OrderItems.orderID,
+                OrderItems.productID,
+                OrderItems.unitPrice,
+                OrderItems.quantity,
+                OrderItems.amount
+            FROM OrderItems
+            ORDER BY OrderItems.orderItemID ASC;
+        `;
 
-        // Render the bsg-people.hbs file, and also send the renderer
-        //  an object that contains our bsg_people and bsg_homeworld information
-        res.render('bsg-people', { people: people, homeworlds: homeworlds });
+        // Orders for dropdown
+        const queryOrders = `
+            SELECT 
+                Orders.orderID,
+                Orders.orderNumber
+            FROM Orders
+            ORDER BY Orders.orderID ASC;
+        `;
+
+        // Products for dropdown
+        const queryProducts = `
+            SELECT
+                Products.productID,
+                Products.name
+            FROM Products
+            ORDER BY Products.productID ASC;
+        `;
+
+        const [orderItems] = await db.query(queryOrderItems);
+        const [orders] = await db.query(queryOrders);
+        const [products] = await db.query(queryProducts);
+
+        res.render('orderItems.hbs', {
+            orderItems: orderItems,
+            orders: orders,
+            products: products,
+        });
     } catch (error) {
         console.error('Error executing queries:', error);
-        // Send a generic error message to the browser
         res.status(500).send(
             'An error occurred while executing the database queries.'
         );
