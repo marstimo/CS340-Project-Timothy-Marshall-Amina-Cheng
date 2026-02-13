@@ -161,6 +161,85 @@ app.get('/payments', async function (req, res) {
     }
 });
 
+// Products
+app.get('/products', async function (req, res) {
+    try {
+        const queryProducts = `
+            SELECT
+                productID,
+                productType,
+                setID,
+                name,
+                cardCondition,
+                sku,
+                price,
+                quantity
+            FROM Products
+            ORDER BY productID ASC;
+        `;
+
+        const querySets = `
+            SELECT
+                setID,
+                name
+            FROM Sets
+            ORDER BY setID ASC;
+        `;
+
+        const [products] = await db.query(queryProducts);
+        const [sets] = await db.query(querySets);
+
+        res.render('products', {
+            products: products,
+            sets: sets
+        });
+    } catch (error) {
+        console.error('Error executing Products query:', error);
+        res.status(500).send(
+            'An error occurred while executing the database queries.'
+        );
+    }
+});
+
+// Orders
+app.get('/orders', async function (req, res) {
+    try {
+        const queryOrders = `
+            SELECT
+                orderID,
+                customerID,
+                orderNumber,
+                orderDate,
+                orderStatus,
+                grandTotal
+            FROM Orders
+            ORDER BY orderID ASC;
+        `;
+
+        const queryCustomers = `
+            SELECT
+                customerID,
+                firstName,
+                lastName
+            FROM Customers
+            ORDER BY customerID ASC;
+        `;
+
+        const [orders] = await db.query(queryOrders);
+        const [customers] = await db.query(queryCustomers);
+
+        res.render('orders', {
+            orders: orders,
+            customers: customers
+        });
+    } catch (error) {
+        console.error('Error executing Orders query:', error);
+        res.status(500).send(
+            'An error occurred while executing the database queries.'
+        );
+    }
+});
+
 // ########################################
 // ########## LISTENER
 
