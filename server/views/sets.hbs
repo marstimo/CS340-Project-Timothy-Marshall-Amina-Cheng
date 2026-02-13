@@ -1,0 +1,44 @@
+<h1>Sets</h1>
+
+{{! READ table }}
+<table border="1">
+    <thead>
+        <tr>
+            {{#each sets.[0]}}
+            <th>{{@key}}</th>
+            {{/each}}
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {{#each sets}}
+        <tr>
+            <td>{{this.setID}}</td>
+            <td>{{this.name}}</td>
+            <td>{{this.description}}</td>
+            <td>{{this.releaseDate}}</td>
+
+            {{! DELETE placeholder (Step 3 UI only) }}
+            <td>
+                <button disabled>Delete</button>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+{{! CREATE form (UI only for Step 3) }}
+<h2>Add a Set</h2>
+<form class="cuForm">
+    <label for="set_name">Name:</label>
+    <input type="text" id="set_name" name="set_name" required>
+
+    <label for="set_description">Description:</label>
+    <input type="text" id="set_description" name="set_description">
+
+    <label for="set_releaseDate">Release Date:</label>
+    <input type="date" id="set_releaseDate" name="set_releaseDate" required>
+
+    <input type="submit" value="Add Set" disabled>
+</form>

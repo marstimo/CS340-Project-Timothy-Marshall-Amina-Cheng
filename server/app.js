@@ -104,6 +104,63 @@ app.get('/orderItems', async function (req, res) {
     }
 });
 
+// Sets
+app.get('/sets', async function (req, res) {
+    try {
+        const query = `
+            SELECT 
+                setID,
+                name,
+                description,
+                releaseDate
+            FROM Sets
+            ORDER BY setID ASC;
+        `;
+
+        const [sets] = await db.query(query);
+
+        res.render('sets', { sets: sets });
+    } catch (error) {
+        console.error('Error executing Sets query:', error);
+        res.status(500).send(
+            'An error occurred while executing the database queries.'
+        );
+    }
+});
+
+// Payments
+app.get('/payments', async function (req, res) {
+    try {
+        const queryPayments = `
+            SELECT 
+                paymentID,
+                orderID,
+                paymentNumber,
+                paymentMethod,
+                amount,
+                paymentDate
+            FROM Payments
+            ORDER BY paymentID ASC;
+        `;
+
+        const queryOrders = `
+            SELECT 
+                orderID,
+                orderNumber
+            FROM Orders
+            ORDER BY orderID ASC;
+        `;
+
+        const [payments] = await db.query(queryPayments);
+        const [orders] = await db.query(queryOrders);
+
+        res.render('payments', { payments: payments, orders: orders });
+    } catch (error) {
+        console.error('Error executing Payments query:', error);
+        res.status(500).send('An error occurred while executing the database queries.');
+    }
+});
+
 // ########################################
 // ########## LISTENER
 
