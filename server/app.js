@@ -43,7 +43,7 @@ app.get('/customers', async function (req, res) {
 
         // Render the bsg-people.hbs file, and also send the renderer
         //  an object that contains our bsg_people and bsg_homeworld information
-        res.render('bsg-people', { customers: customers });
+        res.render('customers', { customers: customers });
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
