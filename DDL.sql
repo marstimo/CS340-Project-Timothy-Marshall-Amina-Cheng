@@ -68,7 +68,7 @@ CREATE TABLE Orders ( -- Customer purchase transactions
   CONSTRAINT uq_orders_orderNumber UNIQUE (orderNumber), -- Prevent duplicate order numbers
   CONSTRAINT fk_orders_customers -- FK: each order must belong to an existing customer
     FOREIGN KEY (customerID) REFERENCES Customers(customerID)
-    ON DELETE RESTRICT ON UPDATE CASCADE
+    ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE OrderItems ( -- Intersection table resolving the M:N relationship between Orders and Products
@@ -83,7 +83,7 @@ CREATE TABLE OrderItems ( -- Intersection table resolving the M:N relationship b
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT fk_orderitems_products -- FK: each order item must reference an existing product
     FOREIGN KEY (productID) REFERENCES Products(productID)
-    ON DELETE RESTRICT ON UPDATE CASCADE
+    ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT uq_orderitems_order_product UNIQUE (orderID, productID)
 ) ENGINE=InnoDB;
 

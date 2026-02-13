@@ -1,0 +1,77 @@
+{{! READ table }}
+<table>
+    <thead>
+        <tr>
+            {{#each orders.[0]}}
+            <th>{{@key}}</th>
+            {{/each}}
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {{#each orders}}
+        <tr>
+            <td>{{this.orderID}}</td>
+            <td>{{this.customerID}}</td>
+            <td>{{this.orderNumber}}</td>
+            <td>{{this.orderDate}}</td>
+            <td>{{this.orderStatus}}</td>
+            <td>{{this.grandTotal}}</td>
+
+            {{! DELETE form (UI only for Step 3) }}
+            <form id='delete_order_form'>
+                <input type='hidden' name='delete_order_id' value='{{this.orderID}}' />
+                <td><button type='submit'>Delete</button></td>
+            </form>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+{{! CREATE form (UI only for Step 3) }}
+<h2>Add an Order</h2>
+<form class='cuForm' id='create_order_form'>
+    <label for='create_order_customer_id'>Customer:</label>
+    <select name='create_order_customer_id' id='create_order_customer_id'>
+        <option value='' disabled selected>Select a Customer</option>
+        {{#each customers}}
+        <option value='{{this.customerID}}'>
+            {{this.customerID}} - {{this.firstName}} {{this.lastName}}
+        </option>
+        {{/each}}
+    </select>
+
+    <label for='create_order_number'>Order Number:</label>
+    <input type='text' name='create_order_number' id='create_order_number' />
+
+    <label for='create_order_status'>Status:</label>
+    <input type='text' name='create_order_status' id='create_order_status' />
+
+    <label for='create_order_grand_total'>Grand Total:</label>
+    <input type='number' step='0.01' min='0' name='create_order_grand_total' id='create_order_grand_total' />
+
+    <input type='submit' value='Submit (not wired yet)' />
+</form>
+
+{{! UPDATE form (UI only for Step 3) }}
+<h2>Update an Order</h2>
+<form class='cuForm' id='update_order_form'>
+    <label for='update_order_id'>Order to Update:</label>
+    <select name='update_order_id' id='update_order_id'>
+        <option value='' disabled selected>Select an Order</option>
+        {{#each orders}}
+        <option value='{{this.orderID}}'>
+            {{this.orderID}} - {{this.orderNumber}}
+        </option>
+        {{/each}}
+    </select>
+
+    <label for='update_order_status'>Status:</label>
+    <input type='text' name='update_order_status' id='update_order_status' />
+
+    <label for='update_order_grand_total'>Grand Total:</label>
+    <input type='number' step='0.01' min='0' name='update_order_grand_total' id='update_order_grand_total' />
+
+    <input type='submit' value='Submit (not wired yet)' />
+</form>
