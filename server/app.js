@@ -16,7 +16,7 @@ app.engine('.hbs', engine({ extname: '.hbs' })); // Create instance of handlebar
 app.set('view engine', '.hbs'); // Use handlebars engine for *.hbs files.
 
 // READ ROUTES
-app.get('/home', async function (req, res) {
+app.get('/', async function (req, res) {
     try {
         res.render('home'); // Render the home.hbs file
     } catch (error) {
@@ -43,7 +43,7 @@ app.get('/customers', async function (req, res) {
 
         // Render the bsg-people.hbs file, and also send the renderer
         //  an object that contains our bsg_people and bsg_homeworld information
-        res.render('bsg-people', { customers: customers });
+        res.render('customers', { customers: customers });
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser

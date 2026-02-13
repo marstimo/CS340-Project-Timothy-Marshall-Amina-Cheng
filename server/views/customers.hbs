@@ -3,7 +3,7 @@
     <thead>
         {{! For the table header row, we print the DB attribute names }}
         <tr>
-            {{#each customer.[0]}}
+            {{#each customers.[0]}}
             <th>
                 {{@key}}
             </th>
@@ -14,7 +14,7 @@
 
     <tbody>
         {{! For each row, print the id, fname, lname, homeworld and age }}
-        {{#each customer}}
+        {{#each customers}}
         <tr>
             <td>{{this.customerID}}</td>
             <td>{{this.firstName}}</td>
