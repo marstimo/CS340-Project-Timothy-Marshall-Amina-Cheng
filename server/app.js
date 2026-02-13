@@ -16,7 +16,7 @@ app.engine('.hbs', engine({ extname: '.hbs' })); // Create instance of handlebar
 app.set('view engine', '.hbs'); // Use handlebars engine for *.hbs files.
 
 // READ ROUTES
-app.get('/', async function (req, res) {
+app.get('/home', async function (req, res) {
     try {
         res.render('home'); // Render the home.hbs file
     } catch (error) {
@@ -30,16 +30,20 @@ app.get('/bsg-people', async function (req, res) {
     try {
         // Create and execute our queries
         // In query1, we use a JOIN clause to display the names of the homeworlds
-        const query1 = `SELECT bsg_people.id, bsg_people.fname, bsg_people.lname, \
-            bsg_planets.name AS 'homeworld', bsg_people.age FROM bsg_people \
-            LEFT JOIN bsg_planets ON bsg_people.homeworld = bsg_planets.id;`;
-        const query2 = 'SELECT * FROM bsg_planets;';
-        const [people] = await db.query(query1);
-        const [homeworlds] = await db.query(query2);
+        const query1 = 
+        `SELECT customerID, firstName, lastName, email, phoneNumber, \
+            address1, address2, city, state, zipCode FROM Customers \
+            ORDER BY lastName, firstName;`;
+        // `SELECT bsg_people.id, bsg_people.fname, bsg_people.lname, \
+        //     bsg_planets.name AS 'homeworld', bsg_people.age FROM bsg_people \
+        //     LEFT JOIN bsg_planets ON bsg_people.homeworld = bsg_planets.id;`;
+        // const query2 = 'SELECT * FROM bsg_planets;';
+        const [customers] = await db.query(query1);
+        // const [homeworlds] = await db.query(query2);
 
         // Render the bsg-people.hbs file, and also send the renderer
         //  an object that contains our bsg_people and bsg_homeworld information
-        res.render('bsg-people', { people: people, homeworlds: homeworlds });
+        res.render('bsg-people', { customers: customers });
     } catch (error) {
         console.error('Error executing queries:', error);
         // Send a generic error message to the browser
