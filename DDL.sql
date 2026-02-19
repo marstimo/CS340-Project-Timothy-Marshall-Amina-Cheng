@@ -27,8 +27,8 @@ CREATE TABLE Customers ( -- Stores registered customers who can place orders and
     email       VARCHAR(100) NOT NULL,
     phoneNumber VARCHAR(15) NULL,
     -- Shipping address fields below
-    line1       VARCHAR(100) NOT NULL,
-    line2       VARCHAR(100) NULL,
+    address1    VARCHAR(100) NOT NULL,
+    address2    VARCHAR(100) NULL,
     city        VARCHAR(50)  NOT NULL,
     state       VARCHAR(50)  NOT NULL,
     zipCode     VARCHAR(10)  NOT NULL,
@@ -105,7 +105,7 @@ CREATE TABLE Payments ( -- Payment records associated with completed orders
 -- --------Sample Data--------
 -- ---------------------------
 
-INSERT INTO Customers (firstName, lastName, email, phoneNumber, line1, line2, city, state, zipCode) VALUES
+INSERT INTO Customers (firstName, lastName, email, phoneNumber, address1, address2, city, state, zipCode) VALUES
 ('Tim', 'Marshall', 'tim@example.com', '555-111-2222', '123 SW Oak St', NULL, 'Corvallis', 'OR', '97330'),
 ('Amina', 'Cheng', 'amina@example.com', '555-333-4444', '900 SE Pine St', NULL, 'Albany', 'OR', '97321');
 
