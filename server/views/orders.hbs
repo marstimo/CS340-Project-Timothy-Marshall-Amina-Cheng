@@ -16,16 +16,16 @@
     <tbody>
         {{#each orders}}
         <tr>
-            <td>{{this.orderID}}</td>
-            <td>{{this.customerID}}</td>
-            <td>{{this.orderNumber}}</td>
-            <td>{{this.orderDate}}</td>
-            <td>{{this.orderStatus}}</td>
-            <td>{{this.grandTotal}}</td>
+            <td>{{this.[Order ID]}}</td>
+            <td>{{this.[Customer ID]}}</td>
+            <td>{{this.[Order Number]}}</td>
+            <td>{{this.[Order Date]}}</td>
+            <td>{{this.[Order Status]}}</td>
+            <td>{{this.[Grand Total]}}</td>
 
             {{! DELETE form (UI only for Step 3) }}
             <form id='delete_order_form'>
-                <input type='hidden' name='delete_order_id' value='{{this.orderID}}' />
+                <input type='hidden' name='delete_order_id' value='{{this.[Order ID]}}' />
                 <td><button type='submit'>Delete</button></td>
             </form>
         </tr>
@@ -40,8 +40,8 @@
     <select name='create_order_customer_id' id='create_order_customer_id'>
         <option value='' disabled selected>Select a Customer</option>
         {{#each customers}}
-        <option value='{{this.customerID}}'>
-            {{this.customerID}} - {{this.firstName}} {{this.lastName}}
+        <option value='{{this.[Customer ID]}}'>
+            {{this.[Customer ID]}} - {{this.[First Name]}} {{this.[Last Name]}}
         </option>
         {{/each}}
     </select>
@@ -65,8 +65,8 @@
     <select name='update_order_id' id='update_order_id'>
         <option value='' disabled selected>Select an Order</option>
         {{#each orders}}
-        <option value='{{this.orderID}}'>
-            {{this.orderID}} - {{this.orderNumber}}
+        <option value='{{this.[Order ID]}}'>
+            {{this.[Order ID]}} - {{this.[Order Number]}}
         </option>
         {{/each}}
     </select>

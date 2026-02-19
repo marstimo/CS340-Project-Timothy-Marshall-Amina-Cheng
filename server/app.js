@@ -45,10 +45,21 @@ app.get('/home', async function (req, res) {
 // Read Customers
 app.get('/customers', async function (req, res) {
     try {
-        const queryReadCustomer = 
-        `SELECT customerID, firstName, lastName, email, phoneNumber, \
-            address1, address2, city, state, zipCode FROM Customers \
-            ORDER BY lastName, firstName;`;
+        const queryReadCustomer = `
+            SELECT 
+                customerID  AS "Customer ID",
+                firstName   AS "First Name",
+                lastName    AS "Last Name",
+                email       AS "Email",
+                phoneNumber AS "Phone Number",
+                address1    AS "Address Line 1",
+                address2    AS "Address Line 2",
+                city        AS "City",
+                state       AS "State",
+                zipCode     AS "Zip Code"
+            FROM Customers
+            ORDER BY lastName, firstName;
+            `;
         const [customers] = await db.query(queryReadCustomer);
 
         res.render('customers', { customers: customers });
@@ -89,8 +100,17 @@ app.post('/customers', async function (req, res) {
         } = req.body;
 
         const queryInsertCustomer = `
-            INSERT INTO Customers 
-            (firstName, lastName, email, phoneNumber, line1, line2, city, state, zipCode)
+            INSERT INTO Customers(
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+                address1,
+                address2,
+                city,
+                state,
+                zipCode
+            )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
         `;
 
@@ -121,8 +141,17 @@ app.get('/customers/:id/edit', async function (req, res) {
         const customerID = req.params.id;
 
         const queryGetOneCustomer = `
-            SELECT customerID, firstName, lastName, email, phoneNumber,
-                   line1, line2, city, state, zipCode
+            SELECT
+                customerID  AS "Customer ID",
+                firstName   AS "First Name",
+                lastName    AS "Last Name",
+                email       AS "Email",
+                phoneNumber AS "Phone Number",
+                line1       AS "Address Line 1",
+                line2       AS "Address Line 2",
+                city        AS "City",
+                state       AS "State",
+                zipCode     AS "Zip Code"
             FROM Customers
             WHERE customerID = ?;
         `;
@@ -202,12 +231,12 @@ app.get('/orderItems', async function (req, res) {
         // OrderItems rows
         const queryOrderItems = `
             SELECT 
-                OrderItems.orderItemID,
-                OrderItems.orderID,
-                OrderItems.productID,
-                OrderItems.unitPrice,
-                OrderItems.quantity,
-                OrderItems.amount
+                OrderItems.orderItemID AS "Order Item ID",
+                OrderItems.orderID     AS "Order ID",
+                OrderItems.productID   AS "Product ID",
+                OrderItems.unitPrice   AS "Unit Price",
+                OrderItems.quantity    AS "Quantity",
+                OrderItems.amount      AS "Amount"
             FROM OrderItems
             ORDER BY OrderItems.orderItemID ASC;
         `;
@@ -253,10 +282,10 @@ app.get('/sets', async function (req, res) {
     try {
         const query = `
             SELECT 
-                setID,
-                name,
-                description,
-                releaseDate
+                setID AS "Set ID",
+                name AS "Set Name",
+                description AS "Description",
+                releaseDate AS "Release Date"
             FROM Sets
             ORDER BY setID ASC;
         `;
@@ -278,20 +307,20 @@ app.get('/payments', async function (req, res) {
     try {
         const queryPayments = `
             SELECT 
-                paymentID,
-                orderID,
-                paymentNumber,
-                paymentMethod,
-                amount,
-                paymentDate
+                paymentID AS "Payment ID",
+                orderID AS "Order ID",
+                paymentNumber AS "Payment Number",
+                paymentMethod AS "Payment Method",
+                amount AS "Amount",
+                paymentDate AS "Payment Date"
             FROM Payments
             ORDER BY paymentID ASC;
         `;
 
         const queryOrders = `
             SELECT 
-                orderID,
-                orderNumber
+                orderID AS "Order ID",
+                orderNumber AS "Order Number"
             FROM Orders
             ORDER BY orderID ASC;
         `;
@@ -312,22 +341,22 @@ app.get('/products', async function (req, res) {
     try {
         const queryProducts = `
             SELECT
-                productID,
-                productType,
-                setID,
-                name,
-                cardCondition,
-                sku,
-                price,
-                quantity
+                productID AS "Product ID",
+                productType AS "Product Type",
+                setID AS "Set ID",
+                name AS "Name",
+                cardCondition AS "Card Condition",
+                sku AS "SKU",
+                price AS "Price",
+                quantity AS "Quantity"
             FROM Products
             ORDER BY productID ASC;
         `;
 
         const querySets = `
             SELECT
-                setID,
-                name
+                setID AS "Set ID",
+                name AS "Name"
             FROM Sets
             ORDER BY setID ASC;
         `;
@@ -353,21 +382,21 @@ app.get('/orders', async function (req, res) {
     try {
         const queryOrders = `
             SELECT
-                orderID,
-                customerID,
-                orderNumber,
-                orderDate,
-                orderStatus,
-                grandTotal
+                orderID AS "Order ID",
+                customerID AS "Customer ID",
+                orderNumber AS "Order Number",
+                orderDate AS "Order Date",
+                orderStatus AS "Order Status",
+                grandTotal AS "Grand Total"
             FROM Orders
             ORDER BY orderID ASC;
         `;
 
         const queryCustomers = `
             SELECT
-                customerID,
-                firstName,
-                lastName
+                customerID AS "Customer ID",
+                firstName AS "First Name",
+                lastName AS "Last Name"
             FROM Customers
             ORDER BY customerID ASC;
         `;

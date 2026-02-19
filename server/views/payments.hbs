@@ -14,16 +14,16 @@
     <tbody>
         {{#each payments}}
         <tr>
-            <td>{{this.paymentID}}</td>
-            <td>{{this.orderID}}</td>
-            <td>{{this.paymentNumber}}</td>
-            <td>{{this.paymentMethod}}</td>
-            <td>{{this.amount}}</td>
-            <td>{{this.paymentDate}}</td>
+            <td>{{this.[Payment ID]}}</td>
+            <td>{{this.[Order ID]}}</td>
+            <td>{{this.[Payment Number]}}</td>
+            <td>{{this.[Payment Method]}}</td>
+            <td>{{this.[Amount]}}</td>
+            <td>{{this.[Payment Date]}}</td>
 
             {{! DELETE form (UI only for Step 3) }}
             <form id='delete_payment_form'>
-                <input type='hidden' name='delete_payment_id' value='{{this.paymentID}}' />
+                <input type='hidden' name='delete_payment_id' value='{{this.[Payment ID]}}' />
                 <td><button type='submit'>Delete</button></td>
             </form>
         </tr>
@@ -38,8 +38,8 @@
     <select name='create_payment_order_id' id='create_payment_order_id'>
         <option value='' disabled selected>Select an Order</option>
         {{#each orders}}
-        <option value='{{this.orderID}}'>
-            {{this.orderID}} - {{this.orderNumber}}
+        <option value='{{this.[Order ID]}}'>
+            {{this.[Order ID]}} - {{this.[Order Number]}}
         </option>
         {{/each}}
     </select>
@@ -66,8 +66,8 @@
     <select name='update_payment_id' id='update_payment_id'>
         <option value='' disabled selected>Select a Payment</option>
         {{#each payments}}
-        <option value='{{this.paymentID}}'>
-            {{this.paymentID}} - {{this.paymentNumber}}
+        <option value='{{this.[Payment ID]}}'>
+            {{this.[Payment ID]}} - {{this.[Payment Number]}}
         </option>
         {{/each}}
     </select>

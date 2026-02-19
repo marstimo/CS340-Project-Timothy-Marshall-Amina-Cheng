@@ -14,18 +14,18 @@
     <tbody>
         {{#each products}}
         <tr>
-            <td>{{this.productID}}</td>
-            <td>{{this.productType}}</td>
-            <td>{{this.setID}}</td>
-            <td>{{this.name}}</td>
-            <td>{{this.cardCondition}}</td>
-            <td>{{this.sku}}</td>
-            <td>{{this.price}}</td>
-            <td>{{this.quantity}}</td>
+            <td>{{this.[Product ID]}}</td>
+            <td>{{this.[Product Type]}}</td>
+            <td>{{this.[Set ID]}}</td>
+            <td>{{this.[Name]}}</td>
+            <td>{{this.[Card Condition]}}</td>
+            <td>{{this.[SKU]}}</td>
+            <td>{{this.[Price]}}</td>
+            <td>{{this.[Quantity]}}</td>
 
             {{! DELETE form (UI only for Step 3) }}
             <form id='delete_product_form'>
-                <input type='hidden' name='delete_product_id' value='{{this.productID}}' />
+                <input type='hidden' name='delete_product_id' value='{{this.[Product ID]}}' />
                 <td><button type='submit'>Delete</button></td>
             </form>
         </tr>
@@ -47,7 +47,7 @@
     <select name='create_product_set_id' id='create_product_set_id'>
         <option value='' disabled selected>Select Set</option>
         {{#each sets}}
-        <option value='{{this.setID}}'>{{this.setID}} - {{this.name}}</option>
+        <option value='{{this.[Set ID]}}'>{{this.[Set ID]}} - {{this.[Name]}}</option>
         {{/each}}
     </select>
 
@@ -83,8 +83,8 @@
     <select name='update_product_id' id='update_product_id'>
         <option value='' disabled selected>Select a Product</option>
         {{#each products}}
-        <option value='{{this.productID}}'>
-            {{this.productID}} - {{this.name}}
+        <option value='{{this.[Product ID]}}'>
+            {{this.[Product ID]}} - {{this.[Name]}}
         </option>
         {{/each}}
     </select>
@@ -93,7 +93,7 @@
     <select name='update_product_set_id' id='update_product_set_id'>
         <option value='' disabled selected>Select Set</option>
         {{#each sets}}
-        <option value='{{this.setID}}'>{{this.setID}} - {{this.name}}</option>
+        <option value='{{this.[Set ID]}}'>{{this.[Set ID]}} - {{this.[Name]}}</option>
         {{/each}}
     </select>
 
