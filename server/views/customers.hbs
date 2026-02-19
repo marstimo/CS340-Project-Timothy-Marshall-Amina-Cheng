@@ -1,5 +1,9 @@
 <h1>Customers</h1>
 
+<a href="/customers/new">
+    <button>+ Add Customer</button>
+</a>
+
 {{! READ table }}
 <table>
     <thead>
@@ -28,6 +32,18 @@
             <td>{{this.city}}</td>
             <td>{{this.state}}</td>
             <td>{{this.zipCode}}</td>
+            
+            {{! UPDATE form }}
+            <form id='update_customer_form'>
+                <input type='hidden' name='update_customer_id' value='{{this.customerID}}' />
+                <input type='hidden' name='update_customer_name' value='{{this.firstName}} {{this.lastName}}' />
+                <td>
+                    <button type='submit'>
+                        Edit
+                    </button>
+                </td>
+            </form>
+
 
             {{! DELETE form }}
             <form id='delete_customer_form'>
@@ -44,7 +60,7 @@
     </tbody>
 </table>
 
-{{! CREATE form }}
+{{!-- {{! CREATE form }}
 <h2>Add a Customer</h2>
 <form class='cuForm' id='create_customer_form'>
     <label for='create_customer_fname'>First Name: </label>
@@ -71,7 +87,7 @@
     <label for='create_customer_adddress_zipcode'>Zip code: </label>
     <input type='text' name='create_customer_adddress_zipcode' id='create_customer_adddress_zipcode' />
     <input type='submit' />
-</form>
+</form> --}}
 
 {{!-- 
 

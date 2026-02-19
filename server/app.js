@@ -7,13 +7,16 @@ app.use(express.static('public'));
 
 const PORT = process.env.PORT || 7777;
 
+
 // Database
 const db = require('./database/db-connector');
+
 
 // Handlebars
 const { engine } = require('express-handlebars'); // Import express-handlebars engine
 app.engine('.hbs', engine({ extname: '.hbs' })); // Create instance of handlebars
 app.set('view engine', '.hbs'); // Use handlebars engine for *.hbs files.
+
 
 // READ ROUTES
 app.get('/', async function (req, res) {
@@ -26,6 +29,7 @@ app.get('/', async function (req, res) {
     }
 });
 
+
 // Home
 app.get('/home', async function (req, res) {
     try {
@@ -37,24 +41,15 @@ app.get('/home', async function (req, res) {
     }
 });
 
-// Customers
+// Read Customers
 app.get('/customers', async function (req, res) {
     try {
-        // Create and execute our queries
-        // In query1, we use a JOIN clause to display the names of the homeworlds
         const queryReadCustomer = 
         `SELECT customerID, firstName, lastName, email, phoneNumber, \
             address1, address2, city, state, zipCode FROM Customers \
             ORDER BY lastName, firstName;`;
-        // `SELECT bsg_people.id, bsg_people.fname, bsg_people.lname, \
-        //     bsg_planets.name AS 'homeworld', bsg_people.age FROM bsg_people \
-        //     LEFT JOIN bsg_planets ON bsg_people.homeworld = bsg_planets.id;`;
-        // const query2 = 'SELECT * FROM bsg_planets;';
         const [customers] = await db.query(queryReadCustomer);
-        // const [homeworlds] = await db.query(query2);
 
-        // Render the bsg-people.hbs file, and also send the renderer
-        //  an object that contains our bsg_people and bsg_homeworld information
         res.render('customers', { customers: customers });
     } catch (error) {
         console.error('Error executing queries:', error);
@@ -64,6 +59,60 @@ app.get('/customers', async function (req, res) {
         );
     }
 });
+
+
+// Render Add Customer Page
+app.get('/customers/new', async function (req, res) {
+    try {
+        res.render('addCustomer');  // make sure file is addCustomer.hbs
+    } catch (error) {
+        console.error('Error rendering Add Customer page:', error);
+        res.status(500).send('An error occurred.');
+    }
+});
+
+
+// Create Customer
+app.post('/customers', async function (req, res) {
+    try {
+        const {
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            address1,
+            address2,
+            city,
+            state,
+            zipCode
+        } = req.body;
+
+        const queryInsertCustomer = `
+            INSERT INTO Customers 
+            (firstName, lastName, email, phoneNumber, line1, line2, city, state, zipCode)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+        `;
+
+        await db.query(queryInsertCustomer, [
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            address1,
+            address2,
+            city,
+            state,
+            zipCode
+        ]);
+
+        res.redirect('/customers');
+
+    } catch (error) {
+        console.error('Error inserting customer:', error);
+        res.status(500).send('An error occurred while inserting the customer.');
+    }
+});
+
 
 // OrderItems
 app.get('/orderItems', async function (req, res) {
@@ -116,6 +165,7 @@ app.get('/orderItems', async function (req, res) {
     }
 });
 
+
 // Sets
 app.get('/sets', async function (req, res) {
     try {
@@ -139,6 +189,7 @@ app.get('/sets', async function (req, res) {
         );
     }
 });
+
 
 // Payments
 app.get('/payments', async function (req, res) {
@@ -172,6 +223,7 @@ app.get('/payments', async function (req, res) {
         res.status(500).send('An error occurred while executing the database queries.');
     }
 });
+
 
 // Products
 app.get('/products', async function (req, res) {
@@ -212,6 +264,7 @@ app.get('/products', async function (req, res) {
         );
     }
 });
+
 
 // Orders
 app.get('/orders', async function (req, res) {
