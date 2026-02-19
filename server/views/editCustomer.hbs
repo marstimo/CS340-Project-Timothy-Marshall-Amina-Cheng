@@ -1,0 +1,93 @@
+<h1>Edit Customer</h1>
+
+<a href="/customers">
+    <button>← Back to Customers</button>
+</a>
+
+<form class='cuForm' id='update_customer_form' method='POST' action='/customers/{{customer.customerID}}'>
+    <input
+        type='hidden'
+        name='update_customer_id'
+        value='{{customer.customerID}}'
+    />
+
+    <label for='update_customer_firstName'>First Name</label><br>
+    <input
+        type='text'
+        name='update_customer_firstName'
+        id='update_customer_firstName'
+        value='{{customer.firstName}}'
+        required
+    /><br><br>
+
+    <label for='update_customer_lastName'>Last Name</label><br>
+    <input
+        type='text'
+        name='update_customer_lastName'
+        id='update_customer_lastName'
+        value='{{customer.lastName}}'
+        required
+    /><br><br>
+
+    <label for='update_customer_email'>Email</label><br>
+    <input
+        type='email'
+        name='update_customer_email'
+        id='update_customer_email'
+        value='{{customer.email}}'
+        required
+    /><br><br>
+
+    <label for='update_customer_phoneNumber'>Phone Number</label><br>
+    <input
+        type='text'
+        name='update_customer_phoneNumber'
+        id='update_customer_phoneNumber'
+        value='{{customer.phoneNumber}}'
+    /><br>
+
+    <h3>Address</h3>
+
+    <label for='update_customer_address1'>Street Address</label><br>
+    <input
+        type='text'
+        name='update_customer_address1'
+        id='update_customer_address1'
+        value='{{customer.address1}}'
+    /><br><br>
+
+    <label for='update_customer_address2'>Apartment/Suite/Unit #</label><br>
+    <input
+        type='text'
+        name='update_customer_address2'
+        id='update_customer_address2'
+        value='{{customer.address2}}'
+    /><br><br>
+
+    <label for='update_customer_city'>City</label><br>
+    <input
+        type='text'
+        name='update_customer_city'
+        id='update_customer_city'
+        value='{{customer.city}}'
+    /><br><br>
+
+    <label for='update_customer_state'>State</label><br>
+    <input
+        type='text'
+        name='update_customer_state'
+        id='update_customer_state'
+        value='{{customer.state}}'
+    /><br><br>
+
+    <label for='update_customer_zipCode'>Zip Code</label><br>
+    <input
+        type='text'
+        name='update_customer_zipCode'
+        id='update_customer_zipCode'
+        value='{{customer.zipCode}}'
+    />
+
+    <br/><br/>
+    <input type='submit' value='Save Changes' />
+</form>

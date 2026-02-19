@@ -1,5 +1,6 @@
 <h1>Customers</h1>
 
+{{! Add Customer button }}
 <a href="/customers/new">
     <button>+ Add Customer</button>
 </a>
@@ -7,7 +8,6 @@
 {{! READ table }}
 <table>
     <thead>
-        {{! For the table header row, we print the DB attribute names }}
         <tr>
             {{#each customers.[0]}}
             <th>
@@ -19,7 +19,6 @@
     </thead>
 
     <tbody>
-        {{! For each row, print the id, fname, lname, homeworld and age }}
         {{#each customers}}
         <tr>
             <td>{{this.customerID}}</td>
@@ -38,9 +37,9 @@
                 <input type='hidden' name='update_customer_id' value='{{this.customerID}}' />
                 <input type='hidden' name='update_customer_name' value='{{this.firstName}} {{this.lastName}}' />
                 <td>
-                    <button type='submit'>
-                        Edit
-                    </button>
+                    <a href="/customers/{{this.customerID}}/edit">
+                        <button type="button">Edit</button>
+                    </a>
                 </td>
             </form>
 
@@ -55,71 +54,8 @@
                     </button>
                 </td>
             </form>
+
         </tr>
         {{/each}}
     </tbody>
 </table>
-
-{{!-- {{! CREATE form }}
-<h2>Add a Customer</h2>
-<form class='cuForm' id='create_customer_form'>
-    <label for='create_customer_fname'>First Name: </label>
-    <input type='text' name='create_customer_fname' id='create_customer_fname' required />
-
-    <label for='create_customer_lname'>Last Name: </label>
-    <input type='text' name='create_customer_lname' id='create_customer_lname' required/>
-
-    <label for='create_customer_email'>Email: </label>
-    <input type='text' name='create_customer_email' id='create_customer_email' required/>
-
-    <label for='create_customer_phone_number'>Phone Number: </label>
-    <input type='text' name='create_customer_phone_number' id='create_customer_phone_number' />
-    
-    <h3>Address</h3>
-    <label for='create_customer_adddress_line1'>Line1: </label>
-    <input type='text' name='create_customer_adddress_line1' id='create_customer_adddress_line1' />
-    <label for='create_customer_adddress_line2'>Line2: </label>
-    <input type='text' name='create_customer_adddress_line2' id='create_customer_adddress_line2' />
-    <label for='create_customer_adddress_city'>City: </label>
-    <input type='text' name='create_customer_adddress_city' id='create_customer_adddress_city' />
-    <label for='create_customer_adddress_state'>State: </label>
-    <input type='text' name='create_customer_adddress_state' id='create_customer_adddress_state' />
-    <label for='create_customer_adddress_zipcode'>Zip code: </label>
-    <input type='text' name='create_customer_adddress_zipcode' id='create_customer_adddress_zipcode' />
-    <input type='submit' />
-</form> --}}
-
-{{!-- 
-
-{{! UPDATE form }}
-<h2>Update a Customer</h2>
-<form class='cuForm' id='update_person_form'>
-    <label for='update_customer_id'>Customer to update: </label>
-    <select name='update_customer_id' id='update_customer_id' required>
-        <option value='' disabled selected>Select a Customer</option>
-        {{#each customer}}
-        <option value='{{this.id}}' required>
-            {{this.id}}
-            -
-            {{this.firstName}}
-            {{this.firstName}}
-        </option>
-        {{/each}}
-    </select>
-
-    <label for='update_customer_email'>customer: </label>
-    <select name='update_person_homeworld' id='update_person_homeworld'>
-        <option value='NULL' disabled selected>Select a Planet</option>
-        <option value='NULL'>&lt; None &gt;</option>
-        {{#each homeworlds}}
-        <option value='{{this.id}}' required>
-            {{this.name}}
-        </option>
-        {{/each}}
-    </select>
-
-    <label for='update_person_age'>Age: </label>
-    <input type='number' name='update_person_age' id='update_person_age' min='0' />
-
-    <input type='submit' />
-</form> --}}
