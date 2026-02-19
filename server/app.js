@@ -41,6 +41,7 @@ app.get('/home', async function (req, res) {
     }
 });
 
+
 // Read Customers
 app.get('/customers', async function (req, res) {
     try {
@@ -110,6 +111,87 @@ app.post('/customers', async function (req, res) {
     } catch (error) {
         console.error('Error inserting customer:', error);
         res.status(500).send('An error occurred while inserting the customer.');
+    }
+});
+
+
+// Render Edit Customer Page (preloaded for that customer)
+app.get('/customers/:id/edit', async function (req, res) {
+    try {
+        const customerID = req.params.id;
+
+        const queryGetOneCustomer = `
+            SELECT customerID, firstName, lastName, email, phoneNumber,
+                   line1, line2, city, state, zipCode
+            FROM Customers
+            WHERE customerID = ?;
+        `;
+
+        const [rows] = await db.query(queryGetOneCustomer, [customerID]);
+
+        if (rows.length === 0) {
+            return res.status(404).send('Customer not found.');
+        }
+
+        // IMPORTANT: editCustomer.hbs should use {{customer.firstName}} etc.
+        res.render('editCustomer', { customer: rows[0] });
+
+    } catch (error) {
+        console.error('Error rendering Edit Customer page:', error);
+        res.status(500).send('An error occurred while loading the edit page.');
+    }
+});
+
+
+// Update Customer (Save Changes)
+app.post('/customers/:id', async function (req, res) {
+    try {
+        const customerID = req.params.id;
+
+        const {
+            update_customer_firstName,
+            update_customer_lastName,
+            update_customer_email,
+            update_customer_phoneNumber,
+            update_customer_line1,
+            update_customer_line2,
+            update_customer_city,
+            update_customer_state,
+            update_customer_zipCode
+        } = req.body;
+
+        const queryUpdateCustomer = `
+            UPDATE Customers
+            SET firstName = ?,
+                lastName = ?,
+                email = ?,
+                phoneNumber = ?,
+                line1 = ?,
+                line2 = ?,
+                city = ?,
+                state = ?,
+                zipCode = ?
+            WHERE customerID = ?;
+        `;
+
+        await db.query(queryUpdateCustomer, [
+            update_customer_firstName,
+            update_customer_lastName,
+            update_customer_email,
+            update_customer_phoneNumber,
+            update_customer_line1,
+            update_customer_line2,
+            update_customer_city,
+            update_customer_state,
+            update_customer_zipCode,
+            customerID
+        ]);
+
+        res.redirect('/customers');
+
+    } catch (error) {
+        console.error('Error updating customer:', error);
+        res.status(500).send('An error occurred while updating the customer.');
     }
 });
 
