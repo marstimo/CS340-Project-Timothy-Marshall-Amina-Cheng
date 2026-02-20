@@ -1,25 +1,14 @@
 <h1>Order Items</h1>
 
 {{! READ table }}
+
 <table>
     <thead>
         <tr>
             {{#each orderItems.[0]}}
             <th>{{@key}}</th>
             {{/each}}
-            <th></th>SELECT
-  customerID  AS "Customer ID",
-  firstName   AS "First Name",
-  lastName    AS "Last Name",
-  email       AS "Email",
-  phoneNumber AS "Phone Number",
-  line1       AS "Address Line 1",
-  line2       AS "Address Line 2",
-  city        AS "City",
-  state       AS "State",
-  zipCode     AS "Zip Code"
-FROM Customers
-WHERE customerID = ?;
+            <th></th>
         </tr>
     </thead>
 
@@ -34,18 +23,21 @@ WHERE customerID = ?;
             <td>{{this.[Amount]}}</td>
 
             {{! DELETE form (UI only for Step 3) }}
-            <form id='delete_order_item_form'>
-                <input type='hidden' name='delete_order_item_id' value='{{this.[Order Item ID]}}' />
-                <td><button type='submit'>Delete</button></td>
-            </form>
+            <td>
+                <form id='delete_order_item_form' method='POST' action='/delete-order-item'>
+                    <input type='hidden' name='delete_order_item_id' value='{{this.[Order Item ID]}}' />
+                    <button type='submit'>Delete</button>
+                </form>
+            </td>
         </tr>
         {{/each}}
     </tbody>
 </table>
 
 {{! CREATE form (UI only for Step 3) }}
+
 <h2>Add an Order Item</h2>
-<form class='cuForm' id='create_order_item_form'>
+<form class='cuForm' id='create_order_item_form' method='POST' action='/create-order-item'>
     <label for='create_order_item_order_id'>Order:</label>
     <select name='create_order_item_order_id' id='create_order_item_order_id'>
         <option value='' disabled selected>Select an Order</option>
@@ -61,7 +53,7 @@ WHERE customerID = ?;
         <option value='' disabled selected>Select a Product</option>
         {{#each products}}
         <option value='{{this.[Product ID]}}'>
-            {{this.[Product ID]}} - {{this.name}}
+            {{this.[Product ID]}} - {{this.[Name]}}
         </option>
         {{/each}}
     </select>
@@ -79,13 +71,14 @@ WHERE customerID = ?;
 </form>
 
 {{! UPDATE form (UI only for Step 3) }}
+
 <h2>Update an Order Item</h2>
-<form class='cuForm' id='update_order_item_form'>
+<form class='cuForm' id='update_order_item_form' method='POST' action='/update-order-item'>
     <label for='update_order_item_id'>Order Item to Update:</label>
     <select name='update_order_item_id' id='update_order_item_id'>
         <option value='' disabled selected>Select an Order Item</option>
         {{#each orderItems}}
-        <option value='{{this.orderItemID}}'>
+        <option value='{{this.[Order Item ID]}}'>
             {{this.[Order Item ID]}} - Order {{this.[Order ID]}} / Product {{this.[Product ID]}}
         </option>
         {{/each}}
@@ -95,8 +88,8 @@ WHERE customerID = ?;
     <select name='update_order_item_order_id' id='update_order_item_order_id'>
         <option value='' disabled selected>Select an Order</option>
         {{#each orders}}
-        <option value='{{this.[Order ID]}}'>
-            {{this.[Order ID]}} - {{this.Order Number}}
+        <option value='{{this.orderID}}'>
+            {{this.orderID}} - {{this.orderNumber}}
         </option>
         {{/each}}
     </select>
