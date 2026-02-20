@@ -76,7 +76,7 @@ app.get('/customers', async function (req, res) {
 // Render Add Customer Page
 app.get('/customers/new', async function (req, res) {
     try {
-        res.render('addCustomer');  // make sure file is addCustomer.hbs
+        res.render('newCustomer');
     } catch (error) {
         console.error('Error rendering Add Customer page:', error);
         res.status(500).send('An error occurred.');
