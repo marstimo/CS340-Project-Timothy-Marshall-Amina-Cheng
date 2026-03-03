@@ -10,7 +10,8 @@ const PORT = process.env.PORT || 7777;
 
 // Database
 const db = require('./database/db-connector');
-
+const fs = require('fs');
+const path = require('path');
 
 // Handlebars
 const { engine } = require('express-handlebars'); // Import express-handlebars engine
@@ -147,8 +148,8 @@ app.get('/customers/:id/edit', async function (req, res) {
                 lastName    AS "Last Name",
                 email       AS "Email",
                 phoneNumber AS "Phone Number",
-                line1       AS "Address Line 1",
-                line2       AS "Address Line 2",
+                address1       AS "Address Line 1",
+                address2       AS "Address Line 2",
                 city        AS "City",
                 state       AS "State",
                 zipCode     AS "Zip Code"
@@ -182,8 +183,8 @@ app.post('/customers/:id', async function (req, res) {
             update_customer_lastName,
             update_customer_email,
             update_customer_phoneNumber,
-            update_customer_line1,
-            update_customer_line2,
+            update_customer_address1,
+            update_customer_address2,
             update_customer_city,
             update_customer_state,
             update_customer_zipCode
@@ -195,8 +196,8 @@ app.post('/customers/:id', async function (req, res) {
                 lastName = ?,
                 email = ?,
                 phoneNumber = ?,
-                line1 = ?,
-                line2 = ?,
+                address1 = ?,
+                address2 = ?,
                 city = ?,
                 state = ?,
                 zipCode = ?
@@ -208,8 +209,8 @@ app.post('/customers/:id', async function (req, res) {
             update_customer_lastName,
             update_customer_email,
             update_customer_phoneNumber,
-            update_customer_line1,
-            update_customer_line2,
+            update_customer_address1,
+            update_customer_address2,
             update_customer_city,
             update_customer_state,
             update_customer_zipCode,
@@ -413,6 +414,29 @@ app.get('/orders', async function (req, res) {
         res.status(500).send(
             'An error occurred while executing the database queries.'
         );
+    }
+});
+
+// RESET route
+app.get('/reset', async function (req, res) {
+    try {
+        // assumes procedure already created in DB
+        await db.query('CALL ResetManaVault();');
+        res.redirect('/home');
+    } catch (error) {
+        console.error('RESET failed:', error);
+        res.status(500).send('RESET failed. Check server logs.');
+    }
+});
+
+// Demo delete route (one CUD op)
+app.get('/demo-delete', async function (req, res) {
+    try {
+        await db.query('CALL DemoDeleteTimCustomer();');
+        res.redirect('/customers');
+    } catch (error) {
+        console.error('Demo delete failed:', error);
+        res.status(500).send('Demo delete failed. Check server logs.');
     }
 });
 
