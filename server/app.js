@@ -429,14 +429,22 @@ app.get('/reset', async function (req, res) {
     }
 });
 
-// Demo delete route (one CUD op)
-app.get('/demo-delete', async function (req, res) {
+// Delete Customer
+app.post('/customers/:id/delete', async function (req, res) {
     try {
-        await db.query('CALL DemoDeleteTimCustomer();');
+        const customerID = req.params.id;
+
+        const queryDeleteCustomer = `
+            DELETE FROM Customers
+            WHERE customerID = ?;
+        `;
+
+        await db.query(queryDeleteCustomer, [customerID]);
+
         res.redirect('/customers');
     } catch (error) {
-        console.error('Demo delete failed:', error);
-        res.status(500).send('Demo delete failed. Check server logs.');
+        console.error('Error deleting customer:', error);
+        res.status(500).send('An error occurred while deleting the customer.');
     }
 });
 
