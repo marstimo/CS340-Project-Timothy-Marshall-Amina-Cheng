@@ -1,18 +1,15 @@
 <h1>Customers</h1>
 
-{{! Add Customer button }}
-<a class="btn"href="/customers/new">+ Add Customer</a>
+<a class="btn" href="/customers/new">+ Add Customer</a>
 
-{{! READ table }}
 <table>
     <thead>
         <tr>
             {{#each customers.[0]}}
-            <th>
-                {{@key}}
-            </th>
+            <th>{{@key}}</th>
             {{/each}}
-            <th></th>
+            <th>Edit</th>
+            <th>Delete</th>
         </tr>
     </thead>
 
@@ -29,26 +26,16 @@
             <td>{{this.[City]}}</td>
             <td>{{this.[State]}}</td>
             <td>{{this.[Zip Code]}}</td>
-            
-            {{! UPDATE form }}
-            <form id='update_customer_form'>
-                <input type='hidden' name='update_customer_id' value='{{this.[Customer ID]}}' />
-                <input type='hidden' name='update_customer_name' value='{{this.[First Name]}} {{this.[Last Name]}}' />
-                <td>
-                    <a href="/customers/{{this.[Customer ID]}}/edit">
-                        <button type="button">Edit</button>
-                    </a>
-                </td>
-            </form>
-
-
-            {{! DELETE form }}
+            <td>
+                <a href="/customers/{{this.[Customer ID]}}/edit">
+                    <button type="button">Edit</button>
+                </a>
+            </td>
             <td>
                 <form method="POST" action="/customers/{{this.[Customer ID]}}/delete">
                     <button type="submit">Delete</button>
                 </form>
             </td>
-
         </tr>
         {{/each}}
     </tbody>

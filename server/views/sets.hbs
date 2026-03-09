@@ -1,13 +1,12 @@
 <h1>Sets</h1>
 
-{{! READ table }}
 <table border="1">
     <thead>
         <tr>
             {{#each sets.[0]}}
             <th>{{@key}}</th>
             {{/each}}
-            <th></th>
+            <th>Delete</th>
         </tr>
     </thead>
 
@@ -18,19 +17,18 @@
             <td>{{this.[Set Name]}}</td>
             <td>{{this.[Description]}}</td>
             <td>{{this.[Release Date]}}</td>
-
-            {{! DELETE placeholder (Step 3 UI only) }}
             <td>
-                <button disabled>Delete</button>
+                <form method="POST" action="/sets/{{this.[Set ID]}}/delete">
+                    <button type="submit">Delete</button>
+                </form>
             </td>
         </tr>
         {{/each}}
     </tbody>
 </table>
 
-{{! CREATE form (UI only for Step 3) }}
 <h2>Add a Set</h2>
-<form class="cuForm">
+<form class="cuForm" method="POST" action="/sets/create">
     <label for="set_name">Name:</label>
     <input type="text" id="set_name" name="set_name" required>
 
@@ -40,5 +38,27 @@
     <label for="set_releaseDate">Release Date:</label>
     <input type="date" id="set_releaseDate" name="set_releaseDate" required>
 
-    <input type="submit" value="Add Set" disabled>
+    <input type="submit" value="Add Set">
+</form>
+
+<h2>Update a Set</h2>
+<form class="cuForm" method="POST" action="/sets/update">
+    <label for="update_set_id">Set to Update:</label>
+    <select id="update_set_id" name="update_set_id" required>
+        <option value="" disabled selected>Select a Set</option>
+        {{#each sets}}
+        <option value="{{this.[Set ID]}}">{{this.[Set ID]}} - {{this.[Set Name]}}</option>
+        {{/each}}
+    </select>
+
+    <label for="update_set_name">Name:</label>
+    <input type="text" id="update_set_name" name="update_set_name" required>
+
+    <label for="update_set_description">Description:</label>
+    <input type="text" id="update_set_description" name="update_set_description">
+
+    <label for="update_set_releaseDate">Release Date:</label>
+    <input type="date" id="update_set_releaseDate" name="update_set_releaseDate" required>
+
+    <input type="submit" value="Update Set">
 </form>
