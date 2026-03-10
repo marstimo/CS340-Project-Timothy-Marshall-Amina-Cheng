@@ -20,7 +20,8 @@
             <td>{{this.[Order Status]}}</td>
             <td>{{this.[Grand Total]}}</td>
             <td>
-                <form method='POST' action='/orders/{{this.[Order ID]}}/delete'>
+                <form method='POST' action='/orders/{{this.[Order ID]}}/delete'
+                    onsubmit="return confirm('Are you sure you want to delete Order #{{this.[Order ID]}}?');">
                     <button type='submit'>Delete</button>
                 </form>
             </td>

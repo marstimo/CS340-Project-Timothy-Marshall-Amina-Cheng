@@ -22,7 +22,8 @@
             <td>{{this.[Price]}}</td>
             <td>{{this.[Quantity]}}</td>
             <td>
-                <form method='POST' action='/products/{{this.[Product ID]}}/delete'>
+                <form method='POST' action='/products/{{this.[Product ID]}}/delete'
+                    onsubmit="return confirm('Are you sure you want to delete Product #{{this.[Product ID]}}?');">
                     <button type='submit'>Delete</button>
                 </form>
             </td>

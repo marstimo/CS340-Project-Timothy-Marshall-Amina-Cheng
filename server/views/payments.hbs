@@ -20,7 +20,8 @@
             <td>{{this.[Amount]}}</td>
             <td>{{this.[Payment Date]}}</td>
             <td>
-                <form method='POST' action='/payments/{{this.[Payment ID]}}/delete'>
+                <form method='POST' action='/payments/{{this.[Payment ID]}}/delete'
+                    onsubmit="return confirm('Are you sure you want to delete Payment #{{this.[Payment ID]}}?');">
                     <button type='submit'>Delete</button>
                 </form>
             </td>

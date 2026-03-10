@@ -18,7 +18,8 @@
             <td>{{this.[Description]}}</td>
             <td>{{this.[Release Date]}}</td>
             <td>
-                <form method="POST" action="/sets/{{this.[Set ID]}}/delete">
+                <form method="POST" action="/sets/{{this.[Set ID]}}/delete"
+                    onsubmit="return confirm('Are you sure you want to delete Set #{{this.[Set ID]}}?');">
                     <button type="submit">Delete</button>
                 </form>
             </td>

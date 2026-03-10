@@ -20,7 +20,8 @@
             <td>{{this.[Quantity]}}</td>
             <td>{{this.[Amount]}}</td>
             <td>
-                <form method='POST' action='/delete-order-item'>
+                <form method='POST' action='/delete-order-item'
+                    onsubmit="return confirm('Are you sure you want to delete Order Item #{{this.[Order Item ID]}}?');">
                     <input type='hidden' name='delete_order_item_id' value='{{this.[Order Item ID]}}' />
                     <button type='submit'>Delete</button>
                 </form>
