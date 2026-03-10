@@ -32,7 +32,8 @@
                 </a>
             </td>
             <td>
-                <form method="POST" action="/customers/{{this.[Customer ID]}}/delete">
+                <form method="POST" action="/customers/{{this.[Customer ID]}}/delete"
+                    onsubmit="return confirm('Are you sure you want to delete {{this.[First Name]}} {{this.[Last Name]}}?');">
                     <button type="submit">Delete</button>
                 </form>
             </td>
