@@ -1,3 +1,5 @@
+<!-- ManaVault Inventory Manager - CS340 Portfolio Project -->
+
 <h1>Orders</h1>
 
 <table>
@@ -9,20 +11,19 @@
             <th>Delete</th>
         </tr>
     </thead>
-
     <tbody>
         {{#each orders}}
         <tr>
             <td>{{this.[Order ID]}}</td>
-            <td>{{this.[Customer ID]}}</td>
+            <td>{{this.[Customer]}}</td>
             <td>{{this.[Order Number]}}</td>
             <td>{{this.[Order Date]}}</td>
             <td>{{this.[Order Status]}}</td>
             <td>{{this.[Grand Total]}}</td>
             <td>
-                <form method='POST' action='/orders/{{this.[Order ID]}}/delete'
-                    onsubmit="return confirm('Are you sure you want to delete Order #{{this.[Order ID]}}?');">
-                    <button type='submit'>Delete</button>
+                <form method="POST" action="/orders/{{this.[Order ID]}}/delete"
+                    onsubmit="return confirm('Are you sure you want to delete this order?');">
+                    <button type="submit">Delete</button>
                 </form>
             </td>
         </tr>
@@ -30,66 +31,77 @@
     </tbody>
 </table>
 
-<h2>Add an Order</h2>
-<form class='cuForm' id='create_order_form' method='POST' action='/orders/create'>
-    <label for='create_order_customer_id'>Customer:</label>
-    <select name='create_order_customer_id' id='create_order_customer_id'>
-        <option value=''>No Customer</option>
-        {{#each customers}}
-        <option value='{{this.[Customer ID]}}'>
-            {{this.[Customer ID]}} - {{this.[First Name]}} {{this.[Last Name]}}
-        </option>
-        {{/each}}
-    </select>
+<section class="formSection">
+    <h2>Add an Order</h2>
+    <p class="helperText">Order Number is automatically generated.</p>
+    <form class="cuForm" method="POST" action="/orders/create">
+        <label for="create_order_customer_id">Customer</label>
+        <select name="create_order_customer_id" id="create_order_customer_id">
+            <option value="">Guest / No Customer</option>
+            {{#each customerOptions}}
+            <option value="{{this.customerID}}">{{this.customerLabel}}</option>
+            {{/each}}
+        </select>
 
-    <label for='create_order_number'>Order Number:</label>
-    <input type='text' name='create_order_number' id='create_order_number' required />
+        <label for="create_order_date">Order Date</label>
+        <input type="datetime-local" name="create_order_date" id="create_order_date" required>
 
-    <label for='create_order_date'>Order Date:</label>
-    <input type='datetime-local' name='create_order_date' id='create_order_date' required />
+        <label for="create_order_status">Status</label>
+        <select name="create_order_status" id="create_order_status" required>
+            <option value="" disabled selected>Select Status</option>
+            <option value="Open">Open</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
 
-    <label for='create_order_status'>Status:</label>
-    <input type='text' name='create_order_status' id='create_order_status' />
+        <label for="create_order_grand_total">Grand Total</label>
+        <input type="number" step="0.01" min="0" name="create_order_grand_total" id="create_order_grand_total" required>
 
-    <label for='create_order_grand_total'>Grand Total:</label>
-    <input type='number' step='0.01' min='0' name='create_order_grand_total' id='create_order_grand_total' required />
+        <input type="submit" value="Add Order">
+    </form>
+</section>
 
-    <input type='submit' value='Add Order' />
-</form>
+<section class="formSection">
+    <h2>Update an Order</h2>
+    <form class="cuForm" method="POST" action="/orders/update">
+        <label for="update_order_id">Order to Update</label>
+        <select name="update_order_id" id="update_order_id" required>
+            <option value="" disabled selected>Select an Order</option>
+            {{#each orderOptions}}
+            <option value="{{this.orderID}}">{{this.orderLabel}}</option>
+            {{/each}}
+        </select>
 
-<h2>Update an Order</h2>
-<form class='cuForm' id='update_order_form' method='POST' action='/orders/update'>
-    <label for='update_order_id'>Order to Update:</label>
-    <select name='update_order_id' id='update_order_id' required>
-        <option value='' disabled selected>Select an Order</option>
-        {{#each orders}}
-        <option value='{{this.[Order ID]}}'>
-            {{this.[Order ID]}} - {{this.[Order Number]}}
-        </option>
-        {{/each}}
-    </select>
+        <label for="update_order_customer_id">Customer</label>
+        <select name="update_order_customer_id" id="update_order_customer_id">
+            <option value="">Guest / No Customer</option>
+            {{#each customerOptions}}
+            <option value="{{this.customerID}}">{{this.customerLabel}}</option>
+            {{/each}}
+        </select>
 
-    <label for='update_order_customer_id'>Customer:</label>
-    <select name='update_order_customer_id' id='update_order_customer_id'>
-        <option value=''>No Customer</option>
-        {{#each customers}}
-        <option value='{{this.[Customer ID]}}'>
-            {{this.[Customer ID]}} - {{this.[First Name]}} {{this.[Last Name]}}
-        </option>
-        {{/each}}
-    </select>
+        <label for="update_order_date">Order Date</label>
+        <input type="datetime-local" name="update_order_date" id="update_order_date" required>
 
-    <label for='update_order_number'>Order Number:</label>
-    <input type='text' name='update_order_number' id='update_order_number' required />
+        <label for="update_order_status">Status</label>
+        <select name="update_order_status" id="update_order_status" required>
+            <option value="" disabled selected>Select Status</option>
+            <option value="Open">Open</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
 
-    <label for='update_order_date'>Order Date:</label>
-    <input type='datetime-local' name='update_order_date' id='update_order_date' required />
+        <label for="update_order_grand_total">Grand Total</label>
+        <input type="number" step="0.01" min="0" name="update_order_grand_total" id="update_order_grand_total" required>
 
-    <label for='update_order_status'>Status:</label>
-    <input type='text' name='update_order_status' id='update_order_status' />
+        <input type="submit" value="Update Order">
+    </form>
+</section>
 
-    <label for='update_order_grand_total'>Grand Total:</label>
-    <input type='number' step='0.01' min='0' name='update_order_grand_total' id='update_order_grand_total' required />
-
-    <input type='submit' value='Update Order' />
-</form>
+<script>
+window.orderData = {{{orderRecordsJson}}};
+</script>

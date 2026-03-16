@@ -1,7 +1,12 @@
 /*
-ManaVault Inventory Manager - CS340
+ManaVault Inventory Manager - CS340 Portfolio Project
 Team: Amina Cheng, Timothy Marshall
-DDL + Sample Data
+
+Citation / Originality Statement:
+This DDL file was developed by the team for the CS340 portfolio project.
+It defines the schema and sample data used by the application.
+AI tools were used for formatting help and syntax cleanup.
+All final schema decisions and testing were completed by the team.
 */
 
 SET FOREIGN_KEY_CHECKS = 0; -- Disable FK checks during rebuild

@@ -1,13 +1,22 @@
+<!--
+ManaVault Inventory Manager - CS340 Portfolio Project
+Team: Amina Cheng, Timothy Marshall
+
+Citation / Originality Statement:
+This layout file was developed by the team for the CS340 portfolio project.
+The structure was adapted from course starter patterns and revised by the team.
+AI tools were used for wording, cleanup, and requirement alignment.
+-->
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>CS340-W26 Group 122 Team Project</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <nav>
-        Navigation:
+    <nav class="topNav">
         <a href="/home">Home</a>
         <a href="/products">Products</a>
         <a href="/customers">Customers</a>
@@ -15,10 +24,13 @@
         <a href="/orderItems">Order Items</a>
         <a href="/payments">Payments</a>
         <a href="/sets">Sets</a>
-        <a href="/reset"><strong>RESET DB</strong></a>
+        <a href="/reset" onclick="return confirm('Are you sure you want to reset the database?');"><strong>RESET DB</strong></a>
     </nav>
 
-    {{{body}}}
+    <main>
+        {{{body}}}
+    </main>
 
+    <script src="/forms.js"></script>
 </body>
 </html>

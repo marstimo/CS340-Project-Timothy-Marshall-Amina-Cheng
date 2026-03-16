@@ -1,14 +1,87 @@
-h1, h2 { margin-left: 16px;}
-table {border-collapse: collapse;margin-left: 32px;}
+/*
+ManaVault Inventory Manager - CS340 Portfolio Project
+Team: Amina Cheng, Timothy Marshall
+*/
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #fafafa;
+}
+
+main {
+    padding: 20px;
+}
+
+.topNav {
+    background-color: #d9d9d9;
+    padding: 16px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.topNav a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 600;
+}
+
+h1, h2 {
+    margin-left: 8px;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 16px 8px 24px 8px;
+    width: calc(100% - 16px);
+    background: white;
+}
+
 th, td {
     border: 1px solid #ddd;
-    padding: 12px;
+    padding: 10px;
     text-align: center;
 }
-th {background-color: #f2f2f2;}
-tr:nth-child(even) {background-color: #f9f9f9;}
-.cuForm { margin-left: 32px;}
-input, select { margin-bottom: 4px;margin-right: 12px;}
-nav {background-color: #cecece;padding: 16px;}
-a {margin-left: 16px;}
-.homepageDescription {margin-left: 32px;}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.formSection {
+    background: white;
+    padding: 16px;
+    margin: 16px 8px 24px 8px;
+    border: 1px solid #ddd;
+}
+
+.cuForm {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 10px 14px;
+    align-items: center;
+}
+
+.cuForm input,
+.cuForm select,
+.cuForm button {
+    padding: 8px;
+}
+
+.cuForm input[type="submit"] {
+    grid-column: 1 / span 2;
+    width: 180px;
+}
+
+.helperText {
+    margin-left: 8px;
+    color: #444;
+}
+
+.homepageDescription {
+    margin-left: 8px;
+}

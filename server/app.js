@@ -1,17 +1,27 @@
-// EXPRESS
+/*
+ManaVault Inventory Manager - CS340 Portfolio Project
+Team: Amina Cheng, Timothy Marshall
+
+Citation / Originality Statement:
+This file was developed by the team for the CS340 portfolio project.
+The overall Express/Handlebars application structure was adapted from course starter patterns,
+but the project-specific routes, stored procedure calls, UI data formatting, and page behavior
+were implemented and revised by the team.
+AI tools were used for brainstorming, debugging help, syntax cleanup, and requirement alignment.
+All final logic and testing should be verified by the team.
+*/
+
 const express = require('express');
+const { engine } = require('express-handlebars');
+const db = require('./database/db-connector');
+
 const app = express();
+const PORT = process.env.PORT || 7777;
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-const PORT = process.env.PORT || 7777;
-
-// DATABASE
-const db = require('./database/db-connector');
-
-// HANDLEBARS
-const { engine } = require('express-handlebars');
 app.engine('.hbs', engine({ extname: '.hbs' }));
 app.set('view engine', '.hbs');
 
@@ -19,17 +29,12 @@ function nullIfEmpty(value) {
     return value === undefined || value === null || value === '' ? null : value;
 }
 
-// HOME
-app.get('/', async function (req, res) {
-    try {
-        res.render('home');
-    } catch (error) {
-        console.error('Error rendering home:', error);
-        res.status(500).send('An error occurred while rendering the page.');
-    }
-});
+function toDisplayCurrency(value) {
+    return value === null || value === undefined ? '' : Number(value).toFixed(2);
+}
 
-app.get('/home', async function (req, res) {
+// HOME
+app.get(['/', '/home'], async (req, res) => {
     try {
         res.render('home');
     } catch (error) {
@@ -39,41 +44,54 @@ app.get('/home', async function (req, res) {
 });
 
 // CUSTOMERS
-app.get('/customers', async function (req, res) {
+app.get('/customers', async (req, res) => {
     try {
-        const query = `
-            SELECT 
-                customerID  AS "Customer ID",
-                firstName   AS "First Name",
-                lastName    AS "Last Name",
-                email       AS "Email",
-                phoneNumber AS "Phone Number",
-                address1    AS "Address Line 1",
-                address2    AS "Address Line 2",
-                city        AS "City",
-                state       AS "State",
-                zipCode     AS "Zip Code"
+        const [rows] = await db.query(`
+            SELECT
+                customerID,
+                firstName,
+                lastName,
+                email,
+                COALESCE(phoneNumber, '') AS phoneNumber,
+                address1,
+                COALESCE(address2, '') AS address2,
+                city,
+                state,
+                zipCode
             FROM Customers
             ORDER BY lastName, firstName;
-        `;
-        const [customers] = await db.query(query);
-        res.render('customers', { customers });
+        `);
+
+        const customers = rows.map(r => ({
+            'Customer ID': r.customerID,
+            'First Name': r.firstName,
+            'Last Name': r.lastName,
+            'Email': r.email,
+            'Phone Number': r.phoneNumber,
+            'Address Line 1': r.address1,
+            'Address Line 2': r.address2,
+            'City': r.city,
+            'State': r.state,
+            'Zip Code': r.zipCode
+        }));
+
+        const customerOptions = rows.map(r => ({
+            customerID: r.customerID,
+            customerLabel: `${r.firstName} ${r.lastName} (${r.email})`
+        }));
+
+        res.render('customers', {
+            customers,
+            customerOptions,
+            customerRecordsJson: JSON.stringify(rows)
+        });
     } catch (error) {
         console.error('Error loading customers:', error);
         res.status(500).send('An error occurred while loading customers.');
     }
 });
 
-app.get('/customers/new', async function (req, res) {
-    try {
-        res.render('newCustomer');
-    } catch (error) {
-        console.error('Error rendering new customer page:', error);
-        res.status(500).send('An error occurred.');
-    }
-});
-
-app.post('/customers', async function (req, res) {
+app.post('/customers/create', async (req, res) => {
     try {
         const {
             create_customer_fname,
@@ -87,25 +105,20 @@ app.post('/customers', async function (req, res) {
             create_customer_address_zipcode
         } = req.body;
 
-        const query = `
-            INSERT INTO Customers (
-                firstName, lastName, email, phoneNumber,
-                address1, address2, city, state, zipCode
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-        `;
-
-        await db.query(query, [
-            create_customer_fname,
-            create_customer_lname,
-            create_customer_email,
-            nullIfEmpty(create_customer_phone_number),
-            create_customer_address_line1,
-            nullIfEmpty(create_customer_address_line2),
-            create_customer_address_city,
-            create_customer_address_state,
-            create_customer_address_zipcode
-        ]);
+        await db.query(
+            `CALL CreateCustomer(?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            [
+                create_customer_fname,
+                create_customer_lname,
+                create_customer_email,
+                nullIfEmpty(create_customer_phone_number),
+                create_customer_address_line1,
+                nullIfEmpty(create_customer_address_line2),
+                create_customer_address_city,
+                create_customer_address_state,
+                create_customer_address_zipcode
+            ]
+        );
 
         res.redirect('/customers');
     } catch (error) {
@@ -114,44 +127,10 @@ app.post('/customers', async function (req, res) {
     }
 });
 
-app.get('/customers/:id/edit', async function (req, res) {
+app.post('/customers/update', async (req, res) => {
     try {
-        const customerID = req.params.id;
-
-        const query = `
-            SELECT
-                customerID  AS "Customer ID",
-                firstName   AS "First Name",
-                lastName    AS "Last Name",
-                email       AS "Email",
-                phoneNumber AS "Phone Number",
-                address1    AS "Address Line 1",
-                address2    AS "Address Line 2",
-                city        AS "City",
-                state       AS "State",
-                zipCode     AS "Zip Code"
-            FROM Customers
-            WHERE customerID = ?;
-        `;
-
-        const [rows] = await db.query(query, [customerID]);
-
-        if (rows.length === 0) {
-            return res.status(404).send('Customer not found.');
-        }
-
-        res.render('editCustomer', { customer: rows[0] });
-    } catch (error) {
-        console.error('Error loading edit customer page:', error);
-        res.status(500).send('An error occurred while loading the edit page.');
-    }
-});
-
-app.post('/customers/:id', async function (req, res) {
-    try {
-        const customerID = req.params.id;
-
         const {
+            update_customer_id,
             update_customer_firstName,
             update_customer_lastName,
             update_customer_email,
@@ -163,32 +142,21 @@ app.post('/customers/:id', async function (req, res) {
             update_customer_zipCode
         } = req.body;
 
-        const query = `
-            UPDATE Customers
-            SET firstName = ?,
-                lastName = ?,
-                email = ?,
-                phoneNumber = ?,
-                address1 = ?,
-                address2 = ?,
-                city = ?,
-                state = ?,
-                zipCode = ?
-            WHERE customerID = ?;
-        `;
-
-        await db.query(query, [
-            update_customer_firstName,
-            update_customer_lastName,
-            update_customer_email,
-            nullIfEmpty(update_customer_phoneNumber),
-            update_customer_address1,
-            nullIfEmpty(update_customer_address2),
-            update_customer_city,
-            update_customer_state,
-            update_customer_zipCode,
-            customerID
-        ]);
+        await db.query(
+            `CALL UpdateCustomer(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+            [
+                update_customer_id,
+                update_customer_firstName,
+                update_customer_lastName,
+                update_customer_email,
+                nullIfEmpty(update_customer_phoneNumber),
+                update_customer_address1,
+                nullIfEmpty(update_customer_address2),
+                update_customer_city,
+                update_customer_state,
+                update_customer_zipCode
+            ]
+        );
 
         res.redirect('/customers');
     } catch (error) {
@@ -197,15 +165,9 @@ app.post('/customers/:id', async function (req, res) {
     }
 });
 
-app.post('/customers/:id/delete', async function (req, res) {
+app.post('/customers/:id/delete', async (req, res) => {
     try {
-        const customerID = req.params.id;
-
-        await db.query(
-            `DELETE FROM Customers WHERE customerID = ?;`,
-            [customerID]
-        );
-
+        await db.query(`CALL DeleteCustomer(?);`, [req.params.id]);
         res.redirect('/customers');
     } catch (error) {
         console.error('Error deleting customer:', error);
@@ -214,36 +176,46 @@ app.post('/customers/:id/delete', async function (req, res) {
 });
 
 // SETS
-app.get('/sets', async function (req, res) {
+app.get('/sets', async (req, res) => {
     try {
-        const query = `
-            SELECT 
-                setID AS "Set ID",
-                name AS "Set Name",
-                description AS "Description",
-                releaseDate AS "Release Date"
+        const [rows] = await db.query(`
+            SELECT
+                setID,
+                name,
+                COALESCE(description, '') AS description,
+                DATE_FORMAT(releaseDate, '%Y-%m-%d') AS releaseDate
             FROM Sets
-            ORDER BY setID ASC;
-        `;
+            ORDER BY releaseDate DESC, name;
+        `);
 
-        const [sets] = await db.query(query);
-        res.render('sets', { sets });
+        const sets = rows.map(r => ({
+            'Set ID': r.setID,
+            'Set Name': r.name,
+            'Description': r.description,
+            'Release Date': r.releaseDate
+        }));
+
+        const setOptions = rows.map(r => ({
+            setID: r.setID,
+            setLabel: r.name
+        }));
+
+        res.render('sets', {
+            sets,
+            setOptions,
+            setRecordsJson: JSON.stringify(rows)
+        });
     } catch (error) {
         console.error('Error loading sets:', error);
         res.status(500).send('An error occurred while loading sets.');
     }
 });
 
-app.post('/sets/create', async function (req, res) {
+app.post('/sets/create', async (req, res) => {
     try {
         const { set_name, set_description, set_releaseDate } = req.body;
 
-        const query = `
-            INSERT INTO Sets (name, description, releaseDate)
-            VALUES (?, ?, ?);
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL CreateSetRecord(?, ?, ?);`, [
             set_name,
             nullIfEmpty(set_description),
             set_releaseDate
@@ -256,7 +228,7 @@ app.post('/sets/create', async function (req, res) {
     }
 });
 
-app.post('/sets/update', async function (req, res) {
+app.post('/sets/update', async (req, res) => {
     try {
         const {
             update_set_id,
@@ -265,17 +237,11 @@ app.post('/sets/update', async function (req, res) {
             update_set_releaseDate
         } = req.body;
 
-        const query = `
-            UPDATE Sets
-            SET name = ?, description = ?, releaseDate = ?
-            WHERE setID = ?;
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL UpdateSetRecord(?, ?, ?, ?);`, [
+            update_set_id,
             update_set_name,
             nullIfEmpty(update_set_description),
-            update_set_releaseDate,
-            update_set_id
+            update_set_releaseDate
         ]);
 
         res.redirect('/sets');
@@ -285,12 +251,9 @@ app.post('/sets/update', async function (req, res) {
     }
 });
 
-app.post('/sets/:id/delete', async function (req, res) {
+app.post('/sets/:id/delete', async (req, res) => {
     try {
-        const setID = req.params.id;
-
-        await db.query(`DELETE FROM Sets WHERE setID = ?;`, [setID]);
-
+        await db.query(`CALL DeleteSetRecord(?);`, [req.params.id]);
         res.redirect('/sets');
     } catch (error) {
         console.error('Error deleting set:', error);
@@ -299,41 +262,66 @@ app.post('/sets/:id/delete', async function (req, res) {
 });
 
 // PRODUCTS
-app.get('/products', async function (req, res) {
+app.get('/products', async (req, res) => {
     try {
-        const queryProducts = `
+        const [productRows] = await db.query(`
             SELECT
-                productID AS "Product ID",
-                productType AS "Product Type",
-                setID AS "Set ID",
-                name AS "Name",
-                cardCondition AS "Card Condition",
-                sku AS "SKU",
-                price AS "Price",
-                quantity AS "Quantity"
-            FROM Products
-            ORDER BY productID ASC;
-        `;
+                p.productID,
+                p.productType,
+                p.setID,
+                s.name AS setName,
+                p.name,
+                COALESCE(p.cardCondition, '') AS cardCondition,
+                COALESCE(p.sku, '') AS sku,
+                p.price,
+                p.quantity
+            FROM Products p
+            JOIN Sets s ON p.setID = s.setID
+            ORDER BY p.productType, s.name, p.name;
+        `);
 
-        const querySets = `
+        const [setRows] = await db.query(`
             SELECT
-                setID AS "Set ID",
-                name AS "Name"
+                setID,
+                name
             FROM Sets
-            ORDER BY setID ASC;
-        `;
+            ORDER BY name;
+        `);
 
-        const [products] = await db.query(queryProducts);
-        const [sets] = await db.query(querySets);
+        const products = productRows.map(r => ({
+            'Product ID': r.productID,
+            'Product Type': r.productType,
+            'Set': r.setName,
+            'Name': r.name,
+            'Card Condition': r.cardCondition,
+            'SKU': r.sku,
+            'Price': toDisplayCurrency(r.price),
+            'Quantity': r.quantity
+        }));
 
-        res.render('products', { products, sets });
+        const setOptions = setRows.map(r => ({
+            setID: r.setID,
+            setLabel: r.name
+        }));
+
+        const productOptions = productRows.map(r => ({
+            productID: r.productID,
+            productLabel: `${r.name} (${r.productType})`
+        }));
+
+        res.render('products', {
+            products,
+            setOptions,
+            productOptions,
+            productRecordsJson: JSON.stringify(productRows)
+        });
     } catch (error) {
         console.error('Error loading products:', error);
         res.status(500).send('An error occurred while loading products.');
     }
 });
 
-app.post('/products/create', async function (req, res) {
+app.post('/products/create', async (req, res) => {
     try {
         const {
             create_product_type,
@@ -345,14 +333,7 @@ app.post('/products/create', async function (req, res) {
             create_product_quantity
         } = req.body;
 
-        const query = `
-            INSERT INTO Products (
-                productType, setID, name, cardCondition, sku, price, quantity
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?);
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL CreateProduct(?, ?, ?, ?, ?, ?, ?);`, [
             create_product_type,
             create_product_set_id,
             create_product_name,
@@ -369,7 +350,7 @@ app.post('/products/create', async function (req, res) {
     }
 });
 
-app.post('/products/update', async function (req, res) {
+app.post('/products/update', async (req, res) => {
     try {
         const {
             update_product_id,
@@ -382,27 +363,15 @@ app.post('/products/update', async function (req, res) {
             update_product_quantity
         } = req.body;
 
-        const query = `
-            UPDATE Products
-            SET productType = ?,
-                setID = ?,
-                name = ?,
-                cardCondition = ?,
-                sku = ?,
-                price = ?,
-                quantity = ?
-            WHERE productID = ?;
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL UpdateProduct(?, ?, ?, ?, ?, ?, ?, ?);`, [
+            update_product_id,
             update_product_type,
             update_product_set_id,
             update_product_name,
             nullIfEmpty(update_product_condition),
             nullIfEmpty(update_product_sku),
             update_product_price,
-            update_product_quantity,
-            update_product_id
+            update_product_quantity
         ]);
 
         res.redirect('/products');
@@ -412,12 +381,9 @@ app.post('/products/update', async function (req, res) {
     }
 });
 
-app.post('/products/:id/delete', async function (req, res) {
+app.post('/products/:id/delete', async (req, res) => {
     try {
-        const productID = req.params.id;
-
-        await db.query(`DELETE FROM Products WHERE productID = ?;`, [productID]);
-
+        await db.query(`CALL DeleteProduct(?);`, [req.params.id]);
         res.redirect('/products');
     } catch (error) {
         console.error('Error deleting product:', error);
@@ -426,61 +392,75 @@ app.post('/products/:id/delete', async function (req, res) {
 });
 
 // ORDERS
-app.get('/orders', async function (req, res) {
+app.get('/orders', async (req, res) => {
     try {
-        const queryOrders = `
+        const [orderRows] = await db.query(`
             SELECT
-                orderID AS "Order ID",
-                customerID AS "Customer ID",
-                orderNumber AS "Order Number",
-                orderDate AS "Order Date",
-                orderStatus AS "Order Status",
-                grandTotal AS "Grand Total"
-            FROM Orders
-            ORDER BY orderID ASC;
-        `;
+                o.orderID,
+                o.customerID,
+                COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest') AS customerName,
+                o.orderNumber,
+                DATE_FORMAT(o.orderDate, '%Y-%m-%d %H:%i') AS orderDateDisplay,
+                DATE_FORMAT(o.orderDate, '%Y-%m-%dT%H:%i') AS orderDateInput,
+                o.orderStatus,
+                o.grandTotal,
+                CONCAT(
+                    'Order #', o.orderID,
+                    ' - ',
+                    COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest'),
+                    ' - ',
+                    DATE_FORMAT(o.orderDate, '%Y-%m-%d')
+                ) AS orderLabel
+            FROM Orders o
+            LEFT JOIN Customers c ON o.customerID = c.customerID
+            ORDER BY o.orderDate DESC, o.orderID DESC;
+        `);
 
-        const queryCustomers = `
+        const [customerRows] = await db.query(`
             SELECT
-                customerID AS "Customer ID",
-                firstName AS "First Name",
-                lastName AS "Last Name"
+                customerID,
+                CONCAT(firstName, ' ', lastName, ' (', email, ')') AS customerLabel
             FROM Customers
-            ORDER BY customerID ASC;
-        `;
+            ORDER BY lastName, firstName;
+        `);
 
-        const [orders] = await db.query(queryOrders);
-        const [customers] = await db.query(queryCustomers);
+        const orders = orderRows.map(r => ({
+            'Order ID': r.orderID,
+            'Customer': r.customerName,
+            'Order Number': r.orderNumber,
+            'Order Date': r.orderDateDisplay,
+            'Order Status': r.orderStatus,
+            'Grand Total': toDisplayCurrency(r.grandTotal)
+        }));
 
-        res.render('orders', { orders, customers });
+        res.render('orders', {
+            orders,
+            customerOptions: customerRows,
+            orderOptions: orderRows.map(r => ({
+                orderID: r.orderID,
+                orderLabel: r.orderLabel
+            })),
+            orderRecordsJson: JSON.stringify(orderRows)
+        });
     } catch (error) {
         console.error('Error loading orders:', error);
         res.status(500).send('An error occurred while loading orders.');
     }
 });
 
-app.post('/orders/create', async function (req, res) {
+app.post('/orders/create', async (req, res) => {
     try {
         const {
             create_order_customer_id,
-            create_order_number,
             create_order_date,
             create_order_status,
             create_order_grand_total
         } = req.body;
 
-        const query = `
-            INSERT INTO Orders (
-                customerID, orderNumber, orderDate, orderStatus, grandTotal
-            )
-            VALUES (?, ?, ?, ?, ?);
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL CreateOrderRecord(?, ?, ?, ?);`, [
             nullIfEmpty(create_order_customer_id),
-            create_order_number,
             create_order_date,
-            nullIfEmpty(create_order_status),
+            create_order_status,
             create_order_grand_total
         ]);
 
@@ -491,34 +471,22 @@ app.post('/orders/create', async function (req, res) {
     }
 });
 
-app.post('/orders/update', async function (req, res) {
+app.post('/orders/update', async (req, res) => {
     try {
         const {
             update_order_id,
             update_order_customer_id,
-            update_order_number,
             update_order_date,
             update_order_status,
             update_order_grand_total
         } = req.body;
 
-        const query = `
-            UPDATE Orders
-            SET customerID = ?,
-                orderNumber = ?,
-                orderDate = ?,
-                orderStatus = ?,
-                grandTotal = ?
-            WHERE orderID = ?;
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL UpdateOrderRecord(?, ?, ?, ?, ?);`, [
+            update_order_id,
             nullIfEmpty(update_order_customer_id),
-            update_order_number,
             update_order_date,
-            nullIfEmpty(update_order_status),
-            update_order_grand_total,
-            update_order_id
+            update_order_status,
+            update_order_grand_total
         ]);
 
         res.redirect('/orders');
@@ -528,12 +496,9 @@ app.post('/orders/update', async function (req, res) {
     }
 });
 
-app.post('/orders/:id/delete', async function (req, res) {
+app.post('/orders/:id/delete', async (req, res) => {
     try {
-        const orderID = req.params.id;
-
-        await db.query(`DELETE FROM Orders WHERE orderID = ?;`, [orderID]);
-
+        await db.query(`CALL DeleteOrderRecord(?);`, [req.params.id]);
         res.redirect('/orders');
     } catch (error) {
         console.error('Error deleting order:', error);
@@ -542,70 +507,92 @@ app.post('/orders/:id/delete', async function (req, res) {
 });
 
 // ORDER ITEMS
-app.get('/orderItems', async function (req, res) {
+app.get('/orderItems', async (req, res) => {
     try {
-        const queryOrderItems = `
-            SELECT 
-                orderItemID AS "Order Item ID",
-                orderID AS "Order ID",
-                productID AS "Product ID",
-                unitPrice AS "Unit Price",
-                quantity AS "Quantity",
-                amount AS "Amount"
-            FROM OrderItems
-            ORDER BY orderItemID ASC;
-        `;
-
-        const queryOrders = `
-            SELECT 
-                orderID AS orderID,
-                orderNumber AS orderNumber
-            FROM Orders
-            ORDER BY orderID ASC;
-        `;
-
-        const queryProducts = `
+        const [orderItemRows] = await db.query(`
             SELECT
-                productID AS "Product ID",
-                name AS "Name"
+                oi.orderItemID,
+                oi.orderID,
+                oi.productID,
+                oi.unitPrice,
+                oi.quantity,
+                oi.amount,
+                CONCAT(
+                    'Order #', o.orderID,
+                    ' - ',
+                    COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest'),
+                    ' - ',
+                    DATE_FORMAT(o.orderDate, '%Y-%m-%d')
+                ) AS orderLabel,
+                CONCAT(p.name, ' ($', FORMAT(p.price, 2), ')') AS productLabel
+            FROM OrderItems oi
+            JOIN Orders o ON oi.orderID = o.orderID
+            LEFT JOIN Customers c ON o.customerID = c.customerID
+            JOIN Products p ON oi.productID = p.productID
+            ORDER BY oi.orderItemID ASC;
+        `);
+
+        const [orderRows] = await db.query(`
+            SELECT
+                o.orderID,
+                CONCAT(
+                    'Order #', o.orderID,
+                    ' - ',
+                    COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest'),
+                    ' - ',
+                    DATE_FORMAT(o.orderDate, '%Y-%m-%d')
+                ) AS orderLabel
+            FROM Orders o
+            LEFT JOIN Customers c ON o.customerID = c.customerID
+            ORDER BY o.orderDate DESC, o.orderID DESC;
+        `);
+
+        const [productRows] = await db.query(`
+            SELECT
+                productID,
+                name,
+                price,
+                CONCAT(name, ' ($', FORMAT(price, 2), ')') AS productLabel
             FROM Products
-            ORDER BY productID ASC;
-        `;
+            ORDER BY name;
+        `);
 
-        const [orderItems] = await db.query(queryOrderItems);
-        const [orders] = await db.query(queryOrders);
-        const [products] = await db.query(queryProducts);
+        const orderItems = orderItemRows.map(r => ({
+            'Order Item ID': r.orderItemID,
+            'Order': r.orderLabel,
+            'Product': r.productLabel,
+            'Unit Price': toDisplayCurrency(r.unitPrice),
+            'Quantity': r.quantity,
+            'Amount': toDisplayCurrency(r.amount)
+        }));
 
-        res.render('orderItems', { orderItems, orders, products });
+        res.render('orderItems', {
+            orderItems,
+            orderOptions: orderRows,
+            productOptions: productRows,
+            orderItemRecordsJson: JSON.stringify(orderItemRows),
+            productRecordsJson: JSON.stringify(productRows)
+        });
     } catch (error) {
         console.error('Error loading order items:', error);
         res.status(500).send('An error occurred while loading order items.');
     }
 });
 
-app.post('/create-order-item', async function (req, res) {
+app.post('/orderItems/create', async (req, res) => {
     try {
         const {
             create_order_item_order_id,
             create_order_item_product_id,
             create_order_item_unit_price,
-            create_order_item_quantity,
-            create_order_item_amount
+            create_order_item_quantity
         } = req.body;
 
-        const query = `
-            INSERT INTO OrderItems (
-                orderID, productID, unitPrice, quantity, amount
-            )
-            VALUES (?, ?, ?, ?, ?);
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL CreateOrderItem(?, ?, ?, ?);`, [
             create_order_item_order_id,
             create_order_item_product_id,
             create_order_item_unit_price,
-            create_order_item_quantity,
-            create_order_item_amount
+            create_order_item_quantity
         ]);
 
         res.redirect('/orderItems');
@@ -615,34 +602,22 @@ app.post('/create-order-item', async function (req, res) {
     }
 });
 
-app.post('/update-order-item', async function (req, res) {
+app.post('/orderItems/update', async (req, res) => {
     try {
         const {
             update_order_item_id,
             update_order_item_order_id,
             update_order_item_product_id,
             update_order_item_unit_price,
-            update_order_item_quantity,
-            update_order_item_amount
+            update_order_item_quantity
         } = req.body;
 
-        const query = `
-            UPDATE OrderItems
-            SET orderID = ?,
-                productID = ?,
-                unitPrice = ?,
-                quantity = ?,
-                amount = ?
-            WHERE orderItemID = ?;
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL UpdateOrderItem(?, ?, ?, ?, ?);`, [
+            update_order_item_id,
             update_order_item_order_id,
             update_order_item_product_id,
             update_order_item_unit_price,
-            update_order_item_quantity,
-            update_order_item_amount,
-            update_order_item_id
+            update_order_item_quantity
         ]);
 
         res.redirect('/orderItems');
@@ -652,15 +627,10 @@ app.post('/update-order-item', async function (req, res) {
     }
 });
 
-app.post('/delete-order-item', async function (req, res) {
+app.post('/orderItems/delete', async (req, res) => {
     try {
         const { delete_order_item_id } = req.body;
-
-        await db.query(
-            `DELETE FROM OrderItems WHERE orderItemID = ?;`,
-            [delete_order_item_id]
-        );
-
+        await db.query(`CALL DeleteOrderItem(?);`, [delete_order_item_id]);
         res.redirect('/orderItems');
     } catch (error) {
         console.error('Error deleting order item:', error);
@@ -669,39 +639,70 @@ app.post('/delete-order-item', async function (req, res) {
 });
 
 // PAYMENTS
-app.get('/payments', async function (req, res) {
+app.get('/payments', async (req, res) => {
     try {
-        const queryPayments = `
-            SELECT 
-                paymentID AS "Payment ID",
-                orderID AS "Order ID",
-                paymentNumber AS "Payment Number",
-                paymentMethod AS "Payment Method",
-                amount AS "Amount",
-                paymentDate AS "Payment Date"
-            FROM Payments
-            ORDER BY paymentID ASC;
-        `;
+        const [paymentRows] = await db.query(`
+            SELECT
+                p.paymentID,
+                p.orderID,
+                p.paymentNumber,
+                p.paymentMethod,
+                p.amount,
+                DATE_FORMAT(p.paymentDate, '%Y-%m-%d %H:%i') AS paymentDateDisplay,
+                DATE_FORMAT(p.paymentDate, '%Y-%m-%dT%H:%i') AS paymentDateInput,
+                CONCAT(
+                    'Order #', o.orderID,
+                    ' - ',
+                    COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest'),
+                    ' - ',
+                    DATE_FORMAT(o.orderDate, '%Y-%m-%d')
+                ) AS orderLabel
+            FROM Payments p
+            JOIN Orders o ON p.orderID = o.orderID
+            LEFT JOIN Customers c ON o.customerID = c.customerID
+            ORDER BY p.paymentDate DESC;
+        `);
 
-        const queryOrders = `
-            SELECT 
-                orderID AS "Order ID",
-                orderNumber AS "Order Number"
-            FROM Orders
-            ORDER BY orderID ASC;
-        `;
+        const [orderRows] = await db.query(`
+            SELECT
+                o.orderID,
+                CONCAT(
+                    'Order #', o.orderID,
+                    ' - ',
+                    COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest'),
+                    ' - ',
+                    DATE_FORMAT(o.orderDate, '%Y-%m-%d')
+                ) AS orderLabel
+            FROM Orders o
+            LEFT JOIN Customers c ON o.customerID = c.customerID
+            ORDER BY o.orderDate DESC, o.orderID DESC;
+        `);
 
-        const [payments] = await db.query(queryPayments);
-        const [orders] = await db.query(queryOrders);
+        const payments = paymentRows.map(r => ({
+            'Payment ID': r.paymentID,
+            'Order': r.orderLabel,
+            'Payment Number': r.paymentNumber,
+            'Payment Method': r.paymentMethod,
+            'Amount': toDisplayCurrency(r.amount),
+            'Payment Date': r.paymentDateDisplay
+        }));
 
-        res.render('payments', { payments, orders });
+        res.render('payments', {
+            payments,
+            orderOptions: orderRows,
+            paymentOptions: paymentRows.map(r => ({
+                paymentID: r.paymentID,
+                paymentLabel: `${r.paymentNumber} - ${r.orderLabel}`
+            })),
+            paymentRecordsJson: JSON.stringify(paymentRows)
+        });
     } catch (error) {
         console.error('Error loading payments:', error);
         res.status(500).send('An error occurred while loading payments.');
     }
 });
 
-app.post('/payments/create', async function (req, res) {
+app.post('/payments/create', async (req, res) => {
     try {
         const {
             create_payment_order_id,
@@ -711,14 +712,7 @@ app.post('/payments/create', async function (req, res) {
             create_payment_date
         } = req.body;
 
-        const query = `
-            INSERT INTO Payments (
-                orderID, paymentNumber, paymentMethod, amount, paymentDate
-            )
-            VALUES (?, ?, ?, ?, ?);
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL CreatePayment(?, ?, ?, ?, ?);`, [
             create_payment_order_id,
             create_payment_number,
             create_payment_method,
@@ -733,7 +727,7 @@ app.post('/payments/create', async function (req, res) {
     }
 });
 
-app.post('/payments/update', async function (req, res) {
+app.post('/payments/update', async (req, res) => {
     try {
         const {
             update_payment_id,
@@ -744,23 +738,13 @@ app.post('/payments/update', async function (req, res) {
             update_payment_date
         } = req.body;
 
-        const query = `
-            UPDATE Payments
-            SET orderID = ?,
-                paymentNumber = ?,
-                paymentMethod = ?,
-                amount = ?,
-                paymentDate = ?
-            WHERE paymentID = ?;
-        `;
-
-        await db.query(query, [
+        await db.query(`CALL UpdatePayment(?, ?, ?, ?, ?, ?);`, [
+            update_payment_id,
             update_payment_order_id,
             update_payment_number,
             update_payment_method,
             update_payment_amount,
-            update_payment_date,
-            update_payment_id
+            update_payment_date
         ]);
 
         res.redirect('/payments');
@@ -770,12 +754,9 @@ app.post('/payments/update', async function (req, res) {
     }
 });
 
-app.post('/payments/:id/delete', async function (req, res) {
+app.post('/payments/:id/delete', async (req, res) => {
     try {
-        const paymentID = req.params.id;
-
-        await db.query(`DELETE FROM Payments WHERE paymentID = ?;`, [paymentID]);
-
+        await db.query(`CALL DeletePayment(?);`, [req.params.id]);
         res.redirect('/payments');
     } catch (error) {
         console.error('Error deleting payment:', error);
@@ -784,9 +765,9 @@ app.post('/payments/:id/delete', async function (req, res) {
 });
 
 // RESET
-app.get('/reset', async function (req, res) {
+app.get('/reset', async (req, res) => {
     try {
-        await db.query('CALL ResetManaVault();');
+        await db.query(`CALL ResetManaVault();`);
         res.redirect('/home');
     } catch (error) {
         console.error('RESET failed:', error);
@@ -794,7 +775,6 @@ app.get('/reset', async function (req, res) {
     }
 });
 
-// LISTENER
-app.listen(PORT, function () {
-    console.log(`Express started on port ${PORT}; press Ctrl-C to terminate.`);
+app.listen(PORT, () => {
+    console.log(`Express started on port ${PORT}`);
 });

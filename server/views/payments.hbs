@@ -1,3 +1,5 @@
+<!-- ManaVault Inventory Manager - CS340 Portfolio Project -->
+
 <h1>Payments</h1>
 
 <table>
@@ -9,20 +11,19 @@
             <th>Delete</th>
         </tr>
     </thead>
-
     <tbody>
         {{#each payments}}
         <tr>
             <td>{{this.[Payment ID]}}</td>
-            <td>{{this.[Order ID]}}</td>
+            <td>{{this.[Order]}}</td>
             <td>{{this.[Payment Number]}}</td>
             <td>{{this.[Payment Method]}}</td>
             <td>{{this.[Amount]}}</td>
             <td>{{this.[Payment Date]}}</td>
             <td>
-                <form method='POST' action='/payments/{{this.[Payment ID]}}/delete'
-                    onsubmit="return confirm('Are you sure you want to delete Payment #{{this.[Payment ID]}}?');">
-                    <button type='submit'>Delete</button>
+                <form method="POST" action="/payments/{{this.[Payment ID]}}/delete"
+                    onsubmit="return confirm('Are you sure you want to delete this payment?');">
+                    <button type="submit">Delete</button>
                 </form>
             </td>
         </tr>
@@ -30,66 +31,68 @@
     </tbody>
 </table>
 
-<h2>Add a Payment</h2>
-<form class='cuForm' id='create_payment_form' method='POST' action='/payments/create'>
-    <label for='create_payment_order_id'>Order:</label>
-    <select name='create_payment_order_id' id='create_payment_order_id' required>
-        <option value='' disabled selected>Select an Order</option>
-        {{#each orders}}
-        <option value='{{this.[Order ID]}}'>
-            {{this.[Order ID]}} - {{this.[Order Number]}}
-        </option>
-        {{/each}}
-    </select>
+<section class="formSection">
+    <h2>Add a Payment</h2>
+    <form class="cuForm" method="POST" action="/payments/create">
+        <label for="create_payment_order_id">Order</label>
+        <select name="create_payment_order_id" id="create_payment_order_id" required>
+            <option value="" disabled selected>Select an Order</option>
+            {{#each orderOptions}}
+            <option value="{{this.orderID}}">{{this.orderLabel}}</option>
+            {{/each}}
+        </select>
 
-    <label for='create_payment_number'>Payment Number:</label>
-    <input type='text' name='create_payment_number' id='create_payment_number' required />
+        <label for="create_payment_number">Payment Number</label>
+        <input type="text" name="create_payment_number" id="create_payment_number" required>
 
-    <label for='create_payment_method'>Payment Method:</label>
-    <input type='text' name='create_payment_method' id='create_payment_method' required />
+        <label for="create_payment_method">Payment Method</label>
+        <input type="text" name="create_payment_method" id="create_payment_method" required>
 
-    <label for='create_payment_amount'>Amount:</label>
-    <input type='number' step='0.01' min='0' name='create_payment_amount' id='create_payment_amount' required />
+        <label for="create_payment_amount">Amount</label>
+        <input type="number" step="0.01" min="0" name="create_payment_amount" id="create_payment_amount" required>
 
-    <label for='create_payment_date'>Payment Date:</label>
-    <input type='datetime-local' name='create_payment_date' id='create_payment_date' required />
+        <label for="create_payment_date">Payment Date</label>
+        <input type="datetime-local" name="create_payment_date" id="create_payment_date" required>
 
-    <input type='submit' value='Add Payment' />
-</form>
+        <input type="submit" value="Add Payment">
+    </form>
+</section>
 
-<h2>Update a Payment</h2>
-<form class='cuForm' id='update_payment_form' method='POST' action='/payments/update'>
-    <label for='update_payment_id'>Payment to Update:</label>
-    <select name='update_payment_id' id='update_payment_id' required>
-        <option value='' disabled selected>Select a Payment</option>
-        {{#each payments}}
-        <option value='{{this.[Payment ID]}}'>
-            {{this.[Payment ID]}} - {{this.[Payment Number]}}
-        </option>
-        {{/each}}
-    </select>
+<section class="formSection">
+    <h2>Update a Payment</h2>
+    <form class="cuForm" method="POST" action="/payments/update">
+        <label for="update_payment_id">Payment to Update</label>
+        <select name="update_payment_id" id="update_payment_id" required>
+            <option value="" disabled selected>Select a Payment</option>
+            {{#each paymentOptions}}
+            <option value="{{this.paymentID}}">{{this.paymentLabel}}</option>
+            {{/each}}
+        </select>
 
-    <label for='update_payment_order_id'>Order:</label>
-    <select name='update_payment_order_id' id='update_payment_order_id' required>
-        <option value='' disabled selected>Select an Order</option>
-        {{#each orders}}
-        <option value='{{this.[Order ID]}}'>
-            {{this.[Order ID]}} - {{this.[Order Number]}}
-        </option>
-        {{/each}}
-    </select>
+        <label for="update_payment_order_id">Order</label>
+        <select name="update_payment_order_id" id="update_payment_order_id" required>
+            <option value="" disabled selected>Select an Order</option>
+            {{#each orderOptions}}
+            <option value="{{this.orderID}}">{{this.orderLabel}}</option>
+            {{/each}}
+        </select>
 
-    <label for='update_payment_number'>Payment Number:</label>
-    <input type='text' name='update_payment_number' id='update_payment_number' required />
+        <label for="update_payment_number">Payment Number</label>
+        <input type="text" name="update_payment_number" id="update_payment_number" required>
 
-    <label for='update_payment_method'>Payment Method:</label>
-    <input type='text' name='update_payment_method' id='update_payment_method' required />
+        <label for="update_payment_method">Payment Method</label>
+        <input type="text" name="update_payment_method" id="update_payment_method" required>
 
-    <label for='update_payment_amount'>Amount:</label>
-    <input type='number' step='0.01' min='0' name='update_payment_amount' id='update_payment_amount' required />
+        <label for="update_payment_amount">Amount</label>
+        <input type="number" step="0.01" min="0" name="update_payment_amount" id="update_payment_amount" required>
 
-    <label for='update_payment_date'>Payment Date:</label>
-    <input type='datetime-local' name='update_payment_date' id='update_payment_date' required />
+        <label for="update_payment_date">Payment Date</label>
+        <input type="datetime-local" name="update_payment_date" id="update_payment_date" required>
 
-    <input type='submit' value='Update Payment' />
-</form>
+        <input type="submit" value="Update Payment">
+    </form>
+</section>
+
+<script>
+window.paymentData = {{{paymentRecordsJson}}};
+</script>

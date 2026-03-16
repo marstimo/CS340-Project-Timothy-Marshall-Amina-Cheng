@@ -1,6 +1,6 @@
 -- ManaVault Inventory Manager - CS340
 -- Team: Amina Cheng, Timothy Marshall
--- RESET Stored Procedure (rebuild schema + sample data)
+-- RESET Stored Procedure 
 
 DROP PROCEDURE IF EXISTS ResetManaVault;
 

@@ -1,7 +1,12 @@
 /*
-ManaVualt Inventory Manager - CS340
+ManaVault Inventory Manager - CS340 Portfolio Project
 Team: Amina Cheng, Timothy Marshall
-DML Queries
+
+Citation / Originality Statement:
+This DML file was developed by the team for the CS340 portfolio project.
+It documents the browse queries, dropdown queries, and stored procedure calls used by the application.
+AI tools were used for formatting help and syntax cleanup.
+All final queries and application behavior were reviewed by the team.
 */
 
 -- -------------------------
@@ -14,18 +19,13 @@ FROM Customers
 ORDER BY lastName, firstName;
 
 -- Add customer
-INSERT INTO Customers (firstName, lastName, email, phoneNumber, address1, address2, city, state, zipCode)
-VALUES (@firstName, @lastName, @email, @phoneNumber, @address1, @address2, @city, @state, @zipCode);
+CALL CreateCustomer(@firstName, @lastName, @email, @phoneNumber, @address1, @address2, @city, @state, @zipCode);
 
 -- Update customer
-UPDATE Customers
-SET firstName=@firstName, lastName=@lastName, email=@email, phoneNumber=@phoneNumber,
-    address1=@address1, address2=@address2, city=@city, state=@state, zipCode=@zipCode
-WHERE customerID=@customerID;
+CALL UpdateCustomer(@customerID, @firstName, @lastName, @email, @phoneNumber, @address1, @address2, @city, @state, @zipCode);
 
 -- Delete customer
-DELETE FROM Customers
-WHERE customerID=@customerID;
+CALL DeleteCustomer(@customerID);
 
 -- --------------------
 -- --------Sets--------
@@ -37,17 +37,13 @@ FROM Sets
 ORDER BY releaseDate DESC, name;
 
 -- Add set
-INSERT INTO Sets (name, description, releaseDate)
-VALUES (@name, @description, @releaseDate);
+CALL CreateSetRecord(@name, @description, @releaseDate);
 
 -- Update set
-UPDATE Sets
-SET name=@name, description=@description, releaseDate=@releaseDate
-WHERE setID=@setID;
+CALL UpdateSetRecord(@setID, @name, @description, @releaseDate);
 
 -- Delete set
-DELETE FROM Sets
-WHERE setID=@setID;
+CALL DeleteSetRecord(@setID);
 
 -- ------------------------
 -- --------Products--------
@@ -65,18 +61,13 @@ FROM Sets
 ORDER BY name;
 
 -- Add product
-INSERT INTO Products (productType, setID, name, cardCondition, sku, price, quantity)
-VALUES (@productType, @setID, @name, @cardCondition, @sku, @price, @quantity);
+CALL CreateProduct(@productType, @setID, @name, @cardCondition, @sku, @price, @quantity);
 
 -- Update product
-UPDATE Products
-SET productType=@productType, setID=@setID, name=@name, cardCondition=@cardCondition,
-    sku=@sku, price=@price, quantity=@quantity
-WHERE productID=@productID;
+CALL UpdateProduct(@productID, @productType, @setID, @name, @cardCondition, @sku, @price, @quantity);
 
 -- Delete product
-DELETE FROM Products
-WHERE productID=@productID;
+CALL DeleteProduct(@productID);
 
 -- ----------------------
 -- --------Orders--------
@@ -94,19 +85,25 @@ SELECT customerID, CONCAT(firstName, ' ', lastName, ' (', email, ')') AS custome
 FROM Customers
 ORDER BY lastName, firstName;
 
+-- Dropdown for orders with a more user-friendly label
+SELECT o.orderID,
+       CONCAT('Order #', o.orderID, ' - ',
+              COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest'),
+              ' - ',
+              DATE_FORMAT(o.orderDate, '%Y-%m-%d')) AS orderLabel
+FROM Orders o
+LEFT JOIN Customers c ON o.customerID = c.customerID
+ORDER BY o.orderDate DESC;
+
 -- Add order
-INSERT INTO Orders (customerID, orderNumber, orderDate, orderStatus, grandTotal)
-VALUES (@customerID, @orderNumber, @orderDate, @orderStatus, @grandTotal);
+-- orderNumber is auto-generated in the stored procedure
+CALL CreateOrderRecord(@customerID, @orderDate, @orderStatus, @grandTotal);
 
 -- Update order
-UPDATE Orders
-SET customerID=@customerID, orderNumber=@orderNumber, orderDate=@orderDate,
-    orderStatus=@orderStatus, grandTotal=@grandTotal
-WHERE orderID=@orderID;
+CALL UpdateOrderRecord(@orderID, @customerID, @orderDate, @orderStatus, @grandTotal);
 
 -- Delete order
-DELETE FROM Orders
-WHERE orderID=@orderID;
+CALL DeleteOrderRecord(@orderID);
 
 -- --------------------------
 -- --------OrderItems--------
@@ -121,28 +118,28 @@ JOIN Products p ON oi.productID = p.productID
 ORDER BY o.orderDate DESC, o.orderNumber, oi.orderItemID;
 
 -- Dropdown for orders
-SELECT orderID, orderNumber
-FROM Orders
-ORDER BY orderDate DESC;
+SELECT o.orderID,
+       CONCAT('Order #', o.orderID, ' - ',
+              COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest'),
+              ' - ',
+              DATE_FORMAT(o.orderDate, '%Y-%m-%d')) AS orderLabel
+FROM Orders o
+LEFT JOIN Customers c ON o.customerID = c.customerID
+ORDER BY o.orderDate DESC;
 
 -- Dropdown for products
 SELECT productID, CONCAT(name, ' ($', price, ')') AS productLabel
 FROM Products
 ORDER BY name;
 
--- Add order item
-INSERT INTO OrderItems (orderID, productID, unitPrice, quantity, amount)
-VALUES (@orderID, @productID, @unitPrice, @quantity, @amount);
+-- Add order item (insert into M:N relationship)
+CALL CreateOrderItem(@orderID, @productID, @unitPrice, @quantity);
 
--- Update order item
-UPDATE OrderItems
-SET orderID=@orderID, productID=@productID, unitPrice=@unitPrice,
-    quantity=@quantity, amount=@amount
-WHERE orderItemID=@orderItemID;
+-- Update order item (update one M:N relationship)
+CALL UpdateOrderItem(@orderItemID, @orderID, @productID, @unitPrice, @quantity);
 
--- Delete order item
-DELETE FROM OrderItems
-WHERE orderItemID=@orderItemID;
+-- Delete order item (delete from one M:N relationship)
+CALL DeleteOrderItem(@orderItemID);
 
 -- ------------------------
 -- --------Payments--------
@@ -154,23 +151,28 @@ FROM Payments pay
 JOIN Orders o ON pay.orderID = o.orderID
 ORDER BY pay.paymentDate DESC;
 
--- Dropdown for orders that do NOT already have a payment
-SELECT o.orderID, o.orderNumber
+-- Dropdown for orders
+SELECT o.orderID,
+       CONCAT('Order #', o.orderID, ' - ',
+              COALESCE(CONCAT(c.firstName, ' ', c.lastName), 'Guest'),
+              ' - ',
+              DATE_FORMAT(o.orderDate, '%Y-%m-%d')) AS orderLabel
 FROM Orders o
-LEFT JOIN Payments p ON o.orderID = p.orderID
-WHERE p.orderID IS NULL
+LEFT JOIN Customers c ON o.customerID = c.customerID
 ORDER BY o.orderDate DESC;
 
 -- Add payment
-INSERT INTO Payments (orderID, paymentNumber, paymentMethod, amount, paymentDate)
-VALUES (@orderID, @paymentNumber, @paymentMethod, @amount, @paymentDate);
+CALL CreatePayment(@orderID, @paymentNumber, @paymentMethod, @amount, @paymentDate);
 
 -- Update payment
-UPDATE Payments
-SET orderID=@orderID, paymentNumber=@paymentNumber, paymentMethod=@paymentMethod,
-    amount=@amount, paymentDate=@paymentDate
-WHERE paymentID=@paymentID;
+CALL UpdatePayment(@paymentID, @orderID, @paymentNumber, @paymentMethod, @amount, @paymentDate);
 
 -- Delete payment
-DELETE FROM Payments
-WHERE paymentID=@paymentID;
+CALL DeletePayment(@paymentID);
+
+-- ------------------------
+-- --------RESET DB--------
+-- ------------------------
+
+-- Reset database
+CALL ResetManaVault();

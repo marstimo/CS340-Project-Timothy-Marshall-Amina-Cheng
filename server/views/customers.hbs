@@ -1,6 +1,9 @@
-<h1>Customers</h1>
+<!--
+ManaVault Inventory Manager - CS340 Portfolio Project
+Team: Amina Cheng, Timothy Marshall
+-->
 
-<a class="btn" href="/customers/new">+ Add Customer</a>
+<h1>Customers</h1>
 
 <table>
     <thead>
@@ -8,11 +11,9 @@
             {{#each customers.[0]}}
             <th>{{@key}}</th>
             {{/each}}
-            <th>Edit</th>
             <th>Delete</th>
         </tr>
     </thead>
-
     <tbody>
         {{#each customers}}
         <tr>
@@ -27,11 +28,6 @@
             <td>{{this.[State]}}</td>
             <td>{{this.[Zip Code]}}</td>
             <td>
-                <a href="/customers/{{this.[Customer ID]}}/edit">
-                    <button type="button">Edit</button>
-                </a>
-            </td>
-            <td>
                 <form method="POST" action="/customers/{{this.[Customer ID]}}/delete"
                     onsubmit="return confirm('Are you sure you want to delete {{this.[First Name]}} {{this.[Last Name]}}?');">
                     <button type="submit">Delete</button>
@@ -41,3 +37,83 @@
         {{/each}}
     </tbody>
 </table>
+
+<section class="formSection">
+    <h2>Add a Customer</h2>
+    <form class="cuForm" method="POST" action="/customers/create">
+        <label for="create_customer_fname">First Name</label>
+        <input type="text" name="create_customer_fname" id="create_customer_fname" required>
+
+        <label for="create_customer_lname">Last Name</label>
+        <input type="text" name="create_customer_lname" id="create_customer_lname" required>
+
+        <label for="create_customer_email">Email</label>
+        <input type="email" name="create_customer_email" id="create_customer_email" required>
+
+        <label for="create_customer_phone_number">Phone Number</label>
+        <input type="text" name="create_customer_phone_number" id="create_customer_phone_number">
+
+        <label for="create_customer_address_line1">Street Address</label>
+        <input type="text" name="create_customer_address_line1" id="create_customer_address_line1" required>
+
+        <label for="create_customer_address_line2">Apt / Suite / Unit</label>
+        <input type="text" name="create_customer_address_line2" id="create_customer_address_line2">
+
+        <label for="create_customer_address_city">City</label>
+        <input type="text" name="create_customer_address_city" id="create_customer_address_city" required>
+
+        <label for="create_customer_address_state">State</label>
+        <input type="text" name="create_customer_address_state" id="create_customer_address_state" required>
+
+        <label for="create_customer_address_zipcode">Zip Code</label>
+        <input type="text" name="create_customer_address_zipcode" id="create_customer_address_zipcode" required>
+
+        <input type="submit" value="Add Customer">
+    </form>
+</section>
+
+<section class="formSection">
+    <h2>Update a Customer</h2>
+    <form class="cuForm" method="POST" action="/customers/update">
+        <label for="update_customer_id">Customer to Update</label>
+        <select name="update_customer_id" id="update_customer_id" required>
+            <option value="" disabled selected>Select a Customer</option>
+            {{#each customerOptions}}
+            <option value="{{this.customerID}}">{{this.customerLabel}}</option>
+            {{/each}}
+        </select>
+
+        <label for="update_customer_firstName">First Name</label>
+        <input type="text" name="update_customer_firstName" id="update_customer_firstName" required>
+
+        <label for="update_customer_lastName">Last Name</label>
+        <input type="text" name="update_customer_lastName" id="update_customer_lastName" required>
+
+        <label for="update_customer_email">Email</label>
+        <input type="email" name="update_customer_email" id="update_customer_email" required>
+
+        <label for="update_customer_phoneNumber">Phone Number</label>
+        <input type="text" name="update_customer_phoneNumber" id="update_customer_phoneNumber">
+
+        <label for="update_customer_address1">Street Address</label>
+        <input type="text" name="update_customer_address1" id="update_customer_address1" required>
+
+        <label for="update_customer_address2">Apt / Suite / Unit</label>
+        <input type="text" name="update_customer_address2" id="update_customer_address2">
+
+        <label for="update_customer_city">City</label>
+        <input type="text" name="update_customer_city" id="update_customer_city" required>
+
+        <label for="update_customer_state">State</label>
+        <input type="text" name="update_customer_state" id="update_customer_state" required>
+
+        <label for="update_customer_zipCode">Zip Code</label>
+        <input type="text" name="update_customer_zipCode" id="update_customer_zipCode" required>
+
+        <input type="submit" value="Update Customer">
+    </form>
+</section>
+
+<script>
+window.customerData = {{{customerRecordsJson}}};
+</script>
