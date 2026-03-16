@@ -8,7 +8,7 @@ The overall Express/Handlebars application structure was adapted from course sta
 but the project-specific routes, stored procedure calls, UI data formatting, and page behavior
 were implemented and revised by the team.
 AI tools were used for brainstorming, debugging help, syntax cleanup, and requirement alignment.
-All final logic and testing should be verified by the team.
+All final logic and testing has been verified by the team.
 */
 
 const express = require('express');
@@ -31,6 +31,30 @@ function nullIfEmpty(value) {
 
 function toDisplayCurrency(value) {
     return value === null || value === undefined ? '' : Number(value).toFixed(2);
+}
+
+function sendAlertAndRedirect(res, message, path) {
+    const safeMessage = String(message).replace(/"/g, '&quot;');
+    res.send(`
+        <script>
+            alert("${safeMessage}");
+            window.location.href = "${path}";
+        </script>
+    `);
+}
+
+function handleDeleteError(error, res, redirectPath, friendlyMessage) {
+    console.error(error);
+
+    if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        return sendAlertAndRedirect(res, friendlyMessage, redirectPath);
+    }
+
+    return sendAlertAndRedirect(
+        res,
+        'Sorry, an unexpected database error occurred.',
+        redirectPath
+    );
 }
 
 // HOME
@@ -170,8 +194,12 @@ app.post('/customers/:id/delete', async (req, res) => {
         await db.query(`CALL DeleteCustomer(?);`, [req.params.id]);
         res.redirect('/customers');
     } catch (error) {
-        console.error('Error deleting customer:', error);
-        res.status(500).send('An error occurred while deleting the customer.');
+        return handleDeleteError(
+            error,
+            res,
+            '/customers',
+            'Sorry, this customer cannot be deleted because they are connected to existing orders.'
+        );
     }
 });
 
@@ -256,8 +284,12 @@ app.post('/sets/:id/delete', async (req, res) => {
         await db.query(`CALL DeleteSetRecord(?);`, [req.params.id]);
         res.redirect('/sets');
     } catch (error) {
-        console.error('Error deleting set:', error);
-        res.status(500).send('An error occurred while deleting the set.');
+        return handleDeleteError(
+            error,
+            res,
+            '/sets',
+            'Sorry, this set cannot be deleted because products are still assigned to it.'
+        );
     }
 });
 
@@ -386,8 +418,12 @@ app.post('/products/:id/delete', async (req, res) => {
         await db.query(`CALL DeleteProduct(?);`, [req.params.id]);
         res.redirect('/products');
     } catch (error) {
-        console.error('Error deleting product:', error);
-        res.status(500).send('An error occurred while deleting the product.');
+        return handleDeleteError(
+            error,
+            res,
+            '/products',
+            'Sorry, this product cannot be deleted because it is used in an order item.'
+        );
     }
 });
 
@@ -501,8 +537,12 @@ app.post('/orders/:id/delete', async (req, res) => {
         await db.query(`CALL DeleteOrderRecord(?);`, [req.params.id]);
         res.redirect('/orders');
     } catch (error) {
-        console.error('Error deleting order:', error);
-        res.status(500).send('An error occurred while deleting the order.');
+        return handleDeleteError(
+            error,
+            res,
+            '/orders',
+            'Sorry, this order cannot be deleted because it still has related order items or payments.'
+        );
     }
 });
 
