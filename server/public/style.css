@@ -6,53 +6,99 @@ Team: Amina Cheng, Timothy Marshall
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background: #fafafa;
+    background: #f8fafc;
+    color: #1f2937;
+    line-height: 1.5;
 }
 
 main {
-    padding: 20px;
+    max-width: 1100px;
+    margin:0 auto;
+    padding: 32px 20px;
 }
 
+/* Navigation */
+
 .topNav {
-    background-color: #d9d9d9;
-    padding: 16px;
+    background-color: #ffffff;
+    padding: 16px 24px;
     display: flex;
-    gap: 16px;
+    gap: 14px;
     flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .topNav a {
     text-decoration: none;
-    color: #000;
+    color: #374151;
     font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+.topNav a:hover {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+/* Headings*/
 
 h1, h2 {
-    margin-left: 8px;
+    margin-bottom: 16px;
+    color: #111827;
 }
 
+h1 {
+    font-size: 2rem;
+    margin-top: 8px;
+}
+
+h2 {
+    font-size: 1.35rem;
+    margin-top: 28px;
+}
+
+/* Tables */
+
 table {
-    border-collapse: collapse;
+    /* border-collapse: collapse;
     margin: 16px 8px 24px 8px;
     width: calc(100% - 16px);
-    background: white;
+    background: white; */
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0 32px 0;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
+    padding: 14px 16px;
     text-align: center;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: #f9fafb;
+    color: #374151;
+    font-weight: 700;
 }
 
 tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #fcfdff;
 }
 
-.formSection {
+tr:hover {
+    background-color: #f8fbff;
+}
+
+/* .formSection {
     background: white;
     padding: 16px;
     margin: 16px 8px 24px 8px;
@@ -75,13 +121,128 @@ tr:nth-child(even) {
 .cuForm input[type="submit"] {
     grid-column: 1 / span 2;
     width: 180px;
+} */
+
+/* Form Section */
+
+.formSection {
+    background: #ffffff;
+    padding: 24px;
+    margin: 20px 0 32px 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
+
+.cuForm {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 14px 18px;
+    align-items: center;
+}
+
+.cuForm label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.cuForm input,
+.cuForm select,
+.cuForm button {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: #ffffff;
+    color: #1f2937;
+    box-sizing: border-box;
+}
+
+.cuForm input:focus,
+.cuForm select:focus {
+    outline: none;
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.35);
+}
+
+.cuForm button,
+.cuForm input[type="submit"] {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.cuForm button:hover,
+.cuForm input[type="submit"]:hover {
+    background-color: #1d4ed8;
+}
+
+.cuForm button:active,
+.cuForm input[type="submit"]:active {
+    transform: translateY(1px);
+}
+
+.cuForm input[type="submit"] {
+    grid-column: 1 / span 2;
+    width: 180px;
+    justify-self: start;
+}
+
+/* Helper Text */
 
 .helperText {
     margin-left: 8px;
-    color: #444;
+    color: #6b7280;
+    font-size: 0.95rem;
 }
 
 .homepageDescription {
-    margin-left: 8px;
+    margin-bottom: 16px;
+    color: #4b5563;
+    max-width: 800px;
+}
+
+/* Buttons */
+
+button,
+input[type="submit"] {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover,
+input[type="submit"]:hover {
+    background-color: #1d4ed8;
+}
+
+/* Delete Button */
+
+.deleteBtn {
+    background-color: #ef4444;
+}
+
+.deleteBtn:hover {
+    background-color: #dc2626;
+}
+
+/* Reset Button */
+
+.resetBtn {
+    color: white;
+    background-color: #ef4444;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.resetBtn:hover {
+    background-color: #dc2626;
 }
