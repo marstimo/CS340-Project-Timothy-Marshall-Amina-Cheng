@@ -58,16 +58,11 @@ h1 {
 
 h2 {
     font-size: 1.35rem;
-    margin-top: 28px;
 }
 
 /* Tables */
 
 table {
-    /* border-collapse: collapse;
-    margin: 16px 8px 24px 8px;
-    width: calc(100% - 16px);
-    background: white; */
     border-collapse: collapse;
     width: 100%;
     margin: 20px 0 32px 0;
@@ -98,36 +93,11 @@ tr:hover {
     background-color: #f8fbff;
 }
 
-/* .formSection {
-    background: white;
-    padding: 16px;
-    margin: 16px 8px 24px 8px;
-    border: 1px solid #ddd;
-}
-
-.cuForm {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 10px 14px;
-    align-items: center;
-}
-
-.cuForm input,
-.cuForm select,
-.cuForm button {
-    padding: 8px;
-}
-
-.cuForm input[type="submit"] {
-    grid-column: 1 / span 2;
-    width: 180px;
-} */
-
 /* Form Section */
 
 .formSection {
     background: #ffffff;
-    padding: 24px;
+    padding: 32px;
     margin: 20px 0 32px 0;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
